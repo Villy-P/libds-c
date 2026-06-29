@@ -5,6 +5,8 @@
 #include <stdio.h>
 
 static const int TEST_ARRAY_INITIAL_CAPACITY = 10;
+static const int TEST_ARRAY_RESIZE_CAPACITY = 20;
+static const int TEST_ARRAY_PUSH_COUNT = 15;
 
 static void test_array() {
     // Array Creation
@@ -14,8 +16,16 @@ static void test_array() {
     assert(arr->length == 0);
 
     // Resize
-    assert(ds_array_resize(arr, 20) == true);
-    assert(arr->capacity == 20);
+    assert(ds_array_resize(arr, TEST_ARRAY_RESIZE_CAPACITY) == true);
+    assert(arr->capacity == TEST_ARRAY_RESIZE_CAPACITY);
+
+    // Push elements
+    for (int i = 0; i < TEST_ARRAY_PUSH_COUNT; ++i) {
+        int* value = (int*)malloc(sizeof(int));
+        *value = i;
+        assert(ds_array_push(arr, value) == true);
+        assert(arr->length == (size_t)(i + 1));
+    }
     
     // Clean up
     ds_array_destroy(arr);

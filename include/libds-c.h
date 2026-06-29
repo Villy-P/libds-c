@@ -87,4 +87,17 @@ bool ds_array_resize(ds_array* array, size_t new_capacity) {
     }
     return true;
 }
+
+bool ds_array_push(ds_array* array, void* element) {
+    if (!array) {
+        return false;
+    }
+    if (array->length >= array->capacity) {
+        if (!ds_array_resize(array, array->capacity * 2)) {
+            return false;
+        }
+    }
+    array->data[array->length++] = element;
+    return true;
+}
 #endif
