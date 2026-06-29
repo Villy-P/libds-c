@@ -36,11 +36,11 @@ setup-prod:
 
 # Runs the CMake file
 build:
-	cmake --build $(BUILD_DIR) --config Debug -- -j$(JOBS)
+	cmake --build $(BUILD_DIR) -DDS_ENABLE_ANALYSIS=ON --config Debug -- -j$(JOBS)
 
 # Runs the CMake file in production mode
 build-prod:
-	cmake --build $(BUILD_DIR) --config Release -- -j$(JOBS)
+	cmake --build $(BUILD_DIR) -DDS_ENABLE_ANALYSIS=ON --config Release -- -j$(JOBS)
 
 lint:
 	cmake --build $(BUILD_DIR) --target clang-tidy
