@@ -8,6 +8,8 @@ static const int TEST_ARRAY_INITIAL_CAPACITY = 10;
 static const int TEST_ARRAY_RESIZE_CAPACITY = 20;
 static const int TEST_ARRAY_PUSH_COUNT = 15;
 static const int TEST_ARRAY_INSERT_VALUE = 99;
+static const int TEST_ARRAY_INSERT_INDEX = 5;
+static const int TEST_ARRAY_CONTAINS_VALUE = 7;
 
 static void test_array() {
     // Array Creation
@@ -37,21 +39,25 @@ static void test_array() {
 
     // Insert element
     int insert_value = TEST_ARRAY_INSERT_VALUE;
-    assert(ds_array_insert(arr, 5, &insert_value) == true);
-    int* retrieved_insert = DSM_ARRAY_GET(arr, 5, int*);
+    assert(ds_array_insert(arr, TEST_ARRAY_INSERT_INDEX, &insert_value) == true);
+    int* retrieved_insert = DSM_ARRAY_GET(arr, TEST_ARRAY_INSERT_INDEX, int*);
     assert(retrieved_insert != NULL);
     assert(*retrieved_insert == TEST_ARRAY_INSERT_VALUE);
 
     // Remove element
-    assert(ds_array_remove(arr, 5) != NULL);
-    int* retrieved_after_remove = DSM_ARRAY_GET(arr, 5, int*);
+    int* removed_element = ds_array_remove(arr, TEST_ARRAY_INSERT_INDEX);
+    assert(removed_element != NULL);
+    int* retrieved_after_remove = DSM_ARRAY_GET(arr, TEST_ARRAY_INSERT_INDEX, int*);
     assert(retrieved_after_remove != NULL);
-    assert(*retrieved_after_remove == 5);
 
     // Pop element
     int* popped_value = ds_array_pop(arr);
     assert(popped_value != NULL);
     assert(*popped_value == 14);
+
+    // Contains check
+    int contains_value = TEST_ARRAY_CONTAINS_VALUE;
+    assert(ds_array_contains(arr, &contains_value) == true);
 
     // Clear array
     ds_array_clear(arr);

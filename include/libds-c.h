@@ -35,8 +35,8 @@ bool ds_array_insert(ds_array* array, size_t index, void* element);
 void* ds_array_get(const ds_array* array, size_t index);
 void* ds_array_remove(ds_array* array, size_t index);
 void* ds_array_pop(ds_array* array);
+bool ds_array_contains(ds_array* array, const void* element);
 void ds_array_clear(ds_array* array);
-bool ds_array_contains(ds_array* array, void* element);
 
 #ifndef LIBDS_C_IGNORE_MACROS
     #define DSM_ARRAY_GET(array, index, type) \
@@ -161,6 +161,18 @@ void* ds_array_pop(ds_array* array) {
         ds_array_resize(array, array->capacity / 2);
     }
     return popped_element;
+}
+
+bool ds_array_contains(ds_array* array, const void* element) {
+    if (!array) {
+        return false;
+    }
+    for (size_t i = 0; i < array->length; ++i) {
+        if (array->data[i] == element) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void ds_array_clear(ds_array* array) {
