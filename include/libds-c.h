@@ -30,13 +30,18 @@ void ds_array_destroy(ds_array* array);
 bool ds_array_resize(ds_array* array, size_t new_capacity);
 
 bool ds_array_push(ds_array* array, void* element);
+void* ds_array_get(const ds_array* array, size_t index);
 bool ds_array_insert(ds_array* array, size_t index, void* element);
-void* ds_array_get(ds_array* array, size_t index);
 void* ds_array_remove(ds_array* array, size_t index);
 void ds_array_clear(ds_array* array);
 bool ds_array_contains(ds_array* array, void* element);
 
-#ifdef LIBDS_C_IMPLEMENTATION
+#ifndef LIBDS_C_IGNORE_MACROS
+    #define DSM_ARRAY_GET(array, index, type) \
+        ((type)ds_array_get((array), (index)))
+#endif
+
+#ifdef DS_C_IMPLEMENTATION
 // Implementation of ds_array functions
 ds_array* ds_array_create(size_t initial_capacity) {
     ds_array* array = (ds_array*)malloc(sizeof(ds_array));
@@ -99,5 +104,13 @@ bool ds_array_push(ds_array* array, void* element) {
     }
     array->data[array->length++] = element;
     return true;
+}
+
+void* ds_array_get(const ds_array* array, size_t index) {
+    assert(array != NULL);
+    if (!array || index >= array->length) {
+        return NULL;
+    }
+    return array->data[index];
 }
 #endif

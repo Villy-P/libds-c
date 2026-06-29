@@ -1,4 +1,3 @@
-#define LIBDS_C_IMPLEMENTATION
 #include "libds-c.h"
 
 #include <assert.h>
@@ -20,11 +19,18 @@ static void test_array() {
     assert(arr->capacity == TEST_ARRAY_RESIZE_CAPACITY);
 
     // Push elements
+    int test_values[TEST_ARRAY_PUSH_COUNT];
     for (int i = 0; i < TEST_ARRAY_PUSH_COUNT; ++i) {
-        int* value = (int*)malloc(sizeof(int));
-        *value = i;
-        assert(ds_array_push(arr, value) == true);
+        test_values[i] = i;
+        assert(ds_array_push(arr, &test_values[i]) == true);
         assert(arr->length == (size_t)(i + 1));
+    }
+
+    // Get elements
+    for (int i = 0; i < TEST_ARRAY_PUSH_COUNT; ++i) {
+        int* retrieved = DSM_ARRAY_GET(arr, i, int*);
+        assert(retrieved != NULL);
+        assert(*retrieved == i);
     }
     
     // Clean up

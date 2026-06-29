@@ -1,2 +1,2 @@
 CompileFlags:
-  Add: [-DLIBDS_C_IMPLEMENTATION]
+  Add: [-DDS_C_IMPLEMENTATION]
