@@ -1,6 +1,8 @@
 #pragma once
 
+#include <assert.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 #ifdef DS_PANIC_ON_MALLOC
     #define DS_HANDLE_MALLOC_FAILURE(msg) \
@@ -9,7 +11,7 @@
             exit(EXIT_FAILURE); \
         } while(0)
 #else
-    #define DS_HANDLE_MALLOC_FAILURE(msg) return NULL
+    #define DS_HANDLE_MALLOC_FAILURE(msg) return nullptr
 #endif
 
 typedef struct {
@@ -41,22 +43,21 @@ ds_array* ds_array_create(size_t initial_capacity) {
     if (!ds_array_init(array, initial_capacity)) {
         free(array);
         DS_HANDLE_MALLOC_FAILURE("Failed to initialize ds_array");
-        return NULL;
     }
     return array;
 }
 
-ds_array* ds_array_init(ds_array* array, size_t initial_capacity) {
+bool ds_array_init(ds_array* array, size_t initial_capacity) {
     assert(initial_capacity > 0);
     if (!array) {
-        return NULL;
+        return false;
     }
     array->data = (void**)malloc(initial_capacity * sizeof(void*));
     if (!array->data) {
-        return NULL;
+        return false;
     }
     array->length = 0;
     array->capacity = initial_capacity;
-    return array;
+    return true;
 }
 #endif
