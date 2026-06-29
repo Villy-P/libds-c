@@ -20,6 +20,10 @@ typedef struct {
     size_t capacity;
 } ds_array;
 
+
+// ----- FUNCTION DEFINITIONS -----
+
+// ----- ARRAY -----
 ds_array* ds_array_create(size_t initial_capacity);
 bool ds_array_init(ds_array* array, size_t initial_capacity);
 void ds_array_destroy(ds_array* array);
