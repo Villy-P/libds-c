@@ -53,6 +53,10 @@ static void test_array() {
     assert(popped_value != NULL);
     assert(*popped_value == 14);
 
+    // Clear array
+    ds_array_clear(arr);
+    assert(arr->length == 0);
+
     // Clean up
     ds_array_destroy(arr);
     printf("test_array passed\n");

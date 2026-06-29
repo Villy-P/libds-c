@@ -162,4 +162,10 @@ void* ds_array_pop(ds_array* array) {
     }
     return popped_element;
 }
+
+void ds_array_clear(ds_array* array) {
+    if (array) {
+        array->length = 0;
+    }
+}
 #endif
