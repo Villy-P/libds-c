@@ -41,7 +41,18 @@ static void test_array() {
     int* retrieved_insert = DSM_ARRAY_GET(arr, 5, int*);
     assert(retrieved_insert != NULL);
     assert(*retrieved_insert == TEST_ARRAY_INSERT_VALUE);
-    
+
+    // Remove element
+    assert(ds_array_remove(arr, 5) != NULL);
+    int* retrieved_after_remove = DSM_ARRAY_GET(arr, 5, int*);
+    assert(retrieved_after_remove != NULL);
+    assert(*retrieved_after_remove == 5);
+
+    // Pop element
+    int* popped_value = ds_array_pop(arr);
+    assert(popped_value != NULL);
+    assert(*popped_value == 14);
+
     // Clean up
     ds_array_destroy(arr);
     printf("test_array passed\n");

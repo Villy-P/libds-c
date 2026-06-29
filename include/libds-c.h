@@ -34,6 +34,7 @@ bool ds_array_push(ds_array* array, void* element);
 bool ds_array_insert(ds_array* array, size_t index, void* element);
 void* ds_array_get(const ds_array* array, size_t index);
 void* ds_array_remove(ds_array* array, size_t index);
+void* ds_array_pop(ds_array* array);
 void ds_array_clear(ds_array* array);
 bool ds_array_contains(ds_array* array, void* element);
 
@@ -128,10 +129,37 @@ bool ds_array_insert(ds_array* array, size_t index, void* element) {
 }
 
 void* ds_array_get(const ds_array* array, size_t index) {
-    assert(array != NULL);
     if (!array || index >= array->length) {
         return NULL;
     }
     return array->data[index];
+}
+
+void* ds_array_remove(ds_array* array, size_t index) {
+    if (!array || index >= array->length) {
+        return NULL;
+    }
+    void* removed_element = array->data[index];
+    memmove(
+        (void*)&array->data[index], 
+        (const void*)&array->data[index + 1], 
+        (array->length - index - 1) * sizeof(void*));
+    if (array->length > 0 && array->length < array->capacity / 4) {
+        ds_array_resize(array, array->capacity / 2);
+    }
+    array->length--;
+    return removed_element;
+}
+
+void* ds_array_pop(ds_array* array) {
+    if (!array || array->length == 0) {
+        return NULL;
+    }
+    void* popped_element = array->data[array->length - 1];
+    array->length--;
+    if (array->length > 0 && array->length < array->capacity / 4) {
+        ds_array_resize(array, array->capacity / 2);
+    }
+    return popped_element;
 }
 #endif
