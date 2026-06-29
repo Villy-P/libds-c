@@ -30,6 +30,7 @@ bool ds_array_init(ds_array* array, size_t initial_capacity);
 void ds_array_destroy(ds_array* array);
 bool ds_array_resize(ds_array* array, size_t new_capacity);
 
+bool ds_array_push_array(ds_array* array, ds_array* other_array);
 bool ds_array_push(ds_array* array, void* element);
 bool ds_array_insert(ds_array* array, size_t index, void* element);
 void* ds_array_get(const ds_array* array, size_t index);
@@ -92,6 +93,26 @@ bool ds_array_resize(ds_array* array, size_t new_capacity) {
     if (array->length > new_capacity) {
         array->length = new_capacity;
     }
+    return true;
+}
+
+bool ds_array_push_array(ds_array* array, ds_array* other_array) {
+    if (!array || !other_array || other_array->length == 0) {
+        return false;
+    }
+
+    size_t new_total_length = array->length + other_array->length;
+        if (new_total_length > array->capacity) {
+        if (!ds_array_resize(array, new_total_length)) {
+            return false;
+        }
+    }
+
+    memcpy((void*)&array->data[array->length], 
+           (void*)other_array->data, 
+           other_array->length * sizeof(void*));
+
+    array->length = new_total_length;
     return true;
 }
 
