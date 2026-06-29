@@ -83,3 +83,6 @@ if(CPPCHECK_EXE)
 else()
     message(STATUS "cppcheck not found")
 endif()
+
+add_library(libds-c INTERFACE)
+target_include_directories(libds-c INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
