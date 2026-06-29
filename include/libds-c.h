@@ -60,4 +60,11 @@ bool ds_array_init(ds_array* array, size_t initial_capacity) {
     array->capacity = initial_capacity;
     return true;
 }
+
+void ds_array_destroy(ds_array* array) {
+    if (array) {
+        free((void*)array->data);
+        free(array);
+    }
+}
 #endif

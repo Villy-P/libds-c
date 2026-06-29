@@ -3,7 +3,6 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 static const int TEST_ARRAY_INITIAL_CAPACITY = 10;
 
@@ -14,8 +13,7 @@ static void test_array_creation() {
     assert(arr->length == 0);
     
     // Clean up
-    free(arr->data);
-    free(arr);
+    ds_array_destroy(arr);
     printf("test_array_creation passed\n");
 }
 
