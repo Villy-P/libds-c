@@ -38,6 +38,7 @@ void* ds_array_remove(ds_array* array, size_t index);
 void* ds_array_pop(ds_array* array);
 bool ds_array_contains(ds_array* array, const void* element);
 void ds_array_clear(ds_array* array);
+ds_array* ds_array_clone(const ds_array* array);
 
 #ifndef LIBDS_C_IGNORE_MACROS
     #define DSM_ARRAY_GET(array, index, type) \
@@ -102,7 +103,7 @@ bool ds_array_push_array(ds_array* array, ds_array* other_array) {
     }
 
     size_t new_total_length = array->length + other_array->length;
-        if (new_total_length > array->capacity) {
+    if (new_total_length > array->capacity) {
         if (!ds_array_resize(array, new_total_length)) {
             return false;
         }
@@ -200,5 +201,18 @@ void ds_array_clear(ds_array* array) {
     if (array) {
         array->length = 0;
     }
+}
+
+ds_array* ds_array_clone(const ds_array* array) {
+    if (!array) {
+        return nullptr;
+    }
+    ds_array* new_array = ds_array_create(array->capacity);
+    if (!new_array) {
+        return nullptr;
+    }
+    memcpy((void*)new_array->data, (void*)array->data, array->length * sizeof(void*));
+    new_array->length = array->length;
+    return new_array;
 }
 #endif
