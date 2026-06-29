@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef DS_PANIC_ON_MALLOC
     #define DS_HANDLE_MALLOC_FAILURE(msg) \
@@ -30,8 +31,8 @@ void ds_array_destroy(ds_array* array);
 bool ds_array_resize(ds_array* array, size_t new_capacity);
 
 bool ds_array_push(ds_array* array, void* element);
-void* ds_array_get(const ds_array* array, size_t index);
 bool ds_array_insert(ds_array* array, size_t index, void* element);
+void* ds_array_get(const ds_array* array, size_t index);
 void* ds_array_remove(ds_array* array, size_t index);
 void ds_array_clear(ds_array* array);
 bool ds_array_contains(ds_array* array, void* element);
@@ -103,6 +104,26 @@ bool ds_array_push(ds_array* array, void* element) {
         }
     }
     array->data[array->length++] = element;
+    return true;
+}
+
+bool ds_array_insert(ds_array* array, size_t index, void* element) {
+    if (!array || index > array->length) {
+        return false;
+    }
+    if (array->length >= array->capacity) {
+        size_t new_capacity = (array->capacity == 0) ? 1 : array->capacity * 2;
+        if (!ds_array_resize(array, new_capacity)) {
+            return false;
+        }
+    }
+    memmove(
+        (void*)&array->data[index + 1], 
+        (const void*)&array->data[index], 
+        (array->length - index) * 
+        sizeof(void*));
+    array->data[index] = element;
+    array->length++;
     return true;
 }
 

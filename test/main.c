@@ -1,3 +1,4 @@
+#define DS_C_IMPLEMENTATION
 #include "libds-c.h"
 
 #include <assert.h>
@@ -6,6 +7,7 @@
 static const int TEST_ARRAY_INITIAL_CAPACITY = 10;
 static const int TEST_ARRAY_RESIZE_CAPACITY = 20;
 static const int TEST_ARRAY_PUSH_COUNT = 15;
+static const int TEST_ARRAY_INSERT_VALUE = 99;
 
 static void test_array() {
     // Array Creation
@@ -32,6 +34,13 @@ static void test_array() {
         assert(retrieved != NULL);
         assert(*retrieved == i);
     }
+
+    // Insert element
+    int insert_value = TEST_ARRAY_INSERT_VALUE;
+    assert(ds_array_insert(arr, 5, &insert_value) == true);
+    int* retrieved_insert = DSM_ARRAY_GET(arr, 5, int*);
+    assert(retrieved_insert != NULL);
+    assert(*retrieved_insert == TEST_ARRAY_INSERT_VALUE);
     
     // Clean up
     ds_array_destroy(arr);
