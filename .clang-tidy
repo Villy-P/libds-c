@@ -14,7 +14,9 @@ Checks: >
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   -cppcoreguidelines-init-variables,
   -clang-analyzer-security.VAList,
-  -Wmacro-redefined
+  -Wmacro-redefined,
+  -hicpp-use-nullptr,
+  -modernize-use-nullptr
 WarningsAsErrors: ''
 HeaderFilterRegex: '^(src|include)/.*'
 ExcludeHeaderFilterRegex: '.*(mingw|msys|ucrt|usr|clang|windows|build).*'
