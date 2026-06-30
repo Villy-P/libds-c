@@ -70,7 +70,6 @@ ds_array* ds_array_create(size_t initial_capacity) {
 }
 
 bool ds_array_init(ds_array* array, size_t initial_capacity) {
-    assert(initial_capacity > 0);
     if (!array) {
         return false;
     }
