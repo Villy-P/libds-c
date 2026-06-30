@@ -30,6 +30,7 @@ typedef struct {
 ds_array* ds_array_create(size_t initial_capacity);
 bool ds_array_init(ds_array* array, size_t initial_capacity);
 void ds_array_destroy(ds_array* array);
+void ds_array_destroy_with(ds_array* array, void (*free_fn)(void*));
 bool ds_array_resize(ds_array* array, size_t new_capacity);
 
 bool ds_array_push_array(ds_array* array, ds_array* other_array);
@@ -87,6 +88,18 @@ bool ds_array_init(ds_array* array, size_t initial_capacity) {
 
 void ds_array_destroy(ds_array* array) {
     if (array) {
+        free((void*)array->data);
+        free(array);
+    }
+}
+
+void ds_array_destroy_with(ds_array* array, void (*free_fn)(void*)) {
+    if (array) {
+        if (free_fn) {
+            for (size_t i = 0; i < array->length; ++i) {
+                free_fn(array->data[i]);
+            }
+        }
         free((void*)array->data);
         free(array);
     }
