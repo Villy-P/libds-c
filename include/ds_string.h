@@ -21,6 +21,7 @@ bool ds_string_resize(ds_string* str, size_t new_capacity);
 #ifdef DS_C_IMPLEMENTATION
 
 #define DS_STRING_MIN_CAPACITY 16
+
 ds_string* ds_string_create(const char* initial_data) {
     ds_string* str = (ds_string*)malloc(sizeof(ds_string));
     if (!str) {
@@ -59,6 +60,26 @@ bool ds_string_init(ds_string* str, const char* initial_data) {
     str->data[initial_length] = '\0';
     str->length = initial_length;
     str->capacity = initial_capacity;
+    return true;
+}
+
+void ds_string_destroy(ds_string* str) {
+    if (str) {
+        free(str->data);
+        free(str);
+    }
+}
+
+bool ds_string_resize(ds_string* str, size_t new_capacity) {
+    if (!str || new_capacity <= str->capacity) {
+        return false;
+    }
+    char* new_data = (char*)realloc(str->data, new_capacity);
+    if (!new_data) {
+        DS_HANDLE_MALLOC_FAILURE("Failed to reallocate memory for ds_string data", false);
+    }
+    str->data = new_data;
+    str->capacity = new_capacity;
     return true;
 }
 #endif
