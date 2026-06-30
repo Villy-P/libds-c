@@ -48,6 +48,13 @@ ds_array* ds_array_clone(const ds_array* array);
 #endif
 
 #ifdef DS_C_IMPLEMENTATION
+
+#define DS_ARRAY_MIN_CAPACITY 8
+
+static size_t ds_array_grow(size_t capacity) {
+    return (capacity == 0) ? 1 : capacity * 2;
+}
+
 // Implementation of ds_array functions
 ds_array* ds_array_create(size_t initial_capacity) {
     ds_array* array = (ds_array*)malloc(sizeof(ds_array));
@@ -86,7 +93,6 @@ void ds_array_destroy(ds_array* array) {
 }
 
 bool ds_array_resize(ds_array* array, size_t new_capacity) {
-    assert(new_capacity >= 0);
     if (!array) {
         return false;
     }
@@ -130,7 +136,7 @@ bool ds_array_push(ds_array* array, void* element) {
         return false;
     }
     if (array->length >= array->capacity) {
-        if (!ds_array_resize(array, array->capacity * 2)) {
+        if (!ds_array_resize(array, ds_array_grow(array->capacity))) {
             return false;
         }
     }
@@ -143,8 +149,7 @@ bool ds_array_insert(ds_array* array, size_t index, void* element) {
         return false;
     }
     if (array->length >= array->capacity) {
-        size_t new_capacity = (array->capacity == 0) ? 1 : array->capacity * 2;
-        if (!ds_array_resize(array, new_capacity)) {
+        if (!ds_array_resize(array, ds_array_grow(array->capacity))) {
             return false;
         }
     }
@@ -174,7 +179,9 @@ void* ds_array_remove(ds_array* array, size_t index) {
         (void*)&array->data[index], 
         (const void*)&array->data[index + 1], 
         (array->length - index - 1) * sizeof(void*));
-    if (array->length > 0 && array->length < array->capacity / 4) {
+    if (array->length > 0 &&
+        array->length < array->capacity / 4 &&
+        array->capacity / 2 >= DS_ARRAY_MIN_CAPACITY) {
         ds_array_resize(array, array->capacity / 2);
     }
     array->length--;
@@ -187,7 +194,9 @@ void* ds_array_pop(ds_array* array) {
     }
     void* popped_element = array->data[array->length - 1];
     array->length--;
-    if (array->length > 0 && array->length < array->capacity / 4) {
+    if (array->length > 0 &&
+        array->length < array->capacity / 4 &&
+        array->capacity / 2 >= DS_ARRAY_MIN_CAPACITY) {
         ds_array_resize(array, array->capacity / 2);
     }
     return popped_element;
