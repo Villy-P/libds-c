@@ -18,6 +18,8 @@ bool ds_string_init(ds_string* str, const char* initial_data);
 void ds_string_destroy(ds_string* str);
 bool ds_string_resize(ds_string* str, size_t new_capacity);
 
+bool ds_string_append(ds_string* str, const char* suffix);
+
 #ifdef DS_C_IMPLEMENTATION
 
 #define DS_STRING_MIN_CAPACITY 16
@@ -80,6 +82,29 @@ bool ds_string_resize(ds_string* str, size_t new_capacity) {
     }
     str->data = new_data;
     str->capacity = new_capacity;
+    return true;
+}
+
+bool ds_string_append(ds_string* str, const char* suffix) {
+    if (!str || !suffix) {
+        return false;
+    }
+    size_t suffix_length = strlen(suffix);
+    if (suffix_length > SIZE_MAX - str->length) {
+        return false;
+    }
+    size_t new_length = str->length + suffix_length;
+
+    if (new_length + 1 > str->capacity) {
+        size_t new_capacity = (new_length * 2) + 1;
+        if (!ds_string_resize(str, new_capacity)) {
+            return false;
+        }
+    }
+
+    memcpy(str->data + str->length, suffix, suffix_length);
+    str->length = new_length;
+    str->data[str->length] = '\0';
     return true;
 }
 #endif
