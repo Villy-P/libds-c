@@ -1,5 +1,5 @@
 #define DS_C_IMPLEMENTATION
-#include "libds-c.h"
+#include "libds_c.h"
 
 #include <assert.h>
 #include <stdio.h>
