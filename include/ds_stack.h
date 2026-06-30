@@ -35,4 +35,8 @@ static inline void* ds_stack_peek(const ds_stack* stack) {
     }
     return ds_array_get(stack, stack->length - 1);
 }
+
+static inline bool ds_stack_reverse(ds_stack* stack) {
+    return ds_array_reverse(stack);
+}
 #endif

@@ -142,6 +142,22 @@ static void test_array_clone() {
     printf("test_array_clone passed\n");
 }
 
+static void test_array_reverse() {
+    ds_array* arr = ds_array_create(5);
+    int values[] = {1, 2, 3, 4, 5};
+    for (int i = 0; i < 5; ++i) {
+        ds_array_push(arr, &values[i]);
+    }
+    assert(ds_array_reverse(arr) == true);
+    for (int i = 0; i < 5; ++i) {
+        int* val = DSM_ARRAY_GET(arr, i, int*);
+        assert(val != NULL);
+        assert(*val == values[4 - i]);
+    }
+    ds_array_destroy(arr);
+    printf("test_array_reverse passed\n");
+}
+
 int main() {
     test_array_basic();
     test_array_growth_from_small_capacity();
@@ -151,6 +167,7 @@ int main() {
     test_array_out_of_bounds();
     test_array_null_safety();
     test_array_clone();
+    test_array_reverse();
     printf("All tests passed\n");
     return 0;
 }

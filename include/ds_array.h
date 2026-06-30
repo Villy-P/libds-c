@@ -32,6 +32,7 @@ void* ds_array_pop(ds_array* array);
 bool ds_array_contains(const ds_array* array, const void* element);
 void ds_array_clear(ds_array* array);
 ds_array* ds_array_clone(const ds_array* array);
+bool ds_array_reverse(ds_array* array);
 
 #ifndef LIBDS_C_IGNORE_MACROS
     #define DSM_ARRAY_GET(array, index, type) \
@@ -236,5 +237,17 @@ ds_array* ds_array_clone(const ds_array* array) {
     memcpy((void*)new_array->data, (void*)array->data, array->length * sizeof(void*));
     new_array->length = array->length;
     return new_array;
+}
+
+bool ds_array_reverse(ds_array* array) {
+    if (!array || array->length < 2) {
+        return false;
+    }
+    for (size_t i = 0; i < array->length / 2; ++i) {
+        void* temp = array->data[i];
+        array->data[i] = array->data[array->length - 1 - i];
+        array->data[array->length - 1 - i] = temp;
+    }
+    return true;
 }
 #endif
