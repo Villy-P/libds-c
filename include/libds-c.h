@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -65,6 +66,9 @@ bool ds_array_init(ds_array* array, size_t initial_capacity) {
     if (!array) {
         return false;
     }
+    if (initial_capacity > SIZE_MAX / sizeof(void*)) {
+        return false;
+    }
     array->data = (void**)malloc(initial_capacity * sizeof(void*));
     if (!array->data) {
         return false;
@@ -84,6 +88,9 @@ void ds_array_destroy(ds_array* array) {
 bool ds_array_resize(ds_array* array, size_t new_capacity) {
     assert(new_capacity >= 0);
     if (!array) {
+        return false;
+    }
+    if (new_capacity > SIZE_MAX / sizeof(void*)) {
         return false;
     }
     void** new_data = (void**)realloc((void*)array->data, new_capacity * sizeof(void*));
