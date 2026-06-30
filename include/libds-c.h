@@ -39,7 +39,7 @@ bool ds_array_insert(ds_array* array, size_t index, void* element);
 void* ds_array_get(const ds_array* array, size_t index);
 void* ds_array_remove(ds_array* array, size_t index);
 void* ds_array_pop(ds_array* array);
-bool ds_array_contains(ds_array* array, const void* element);
+bool ds_array_contains(const ds_array* array, const void* element);
 void ds_array_clear(ds_array* array);
 ds_array* ds_array_clone(const ds_array* array);
 
@@ -126,6 +126,9 @@ bool ds_array_resize(ds_array* array, size_t new_capacity) {
 
 bool ds_array_push_array(ds_array* array, ds_array* other_array) {
     if (!array || !other_array || other_array->length == 0) {
+        return false;
+    }
+    if (array == other_array) {
         return false;
     }
 
@@ -215,7 +218,7 @@ void* ds_array_pop(ds_array* array) {
     return popped_element;
 }
 
-bool ds_array_contains(ds_array* array, const void* element) {
+bool ds_array_contains(const ds_array* array, const void* element) {
     if (!array) {
         return false;
     }
