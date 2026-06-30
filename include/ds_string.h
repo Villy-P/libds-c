@@ -19,6 +19,8 @@ void ds_string_destroy(ds_string* str);
 bool ds_string_resize(ds_string* str, size_t new_capacity);
 
 bool ds_string_append(ds_string* str, const char* suffix);
+bool ds_string_equals(const ds_string* str, const ds_string* other);
+bool ds_string_equals_cstr(const ds_string* str, const char* cstr);
 
 #ifdef DS_C_IMPLEMENTATION
 
@@ -107,4 +109,23 @@ bool ds_string_append(ds_string* str, const char* suffix) {
     str->data[str->length] = '\0';
     return true;
 }
+
+bool ds_string_equals(const ds_string* str, const ds_string* other) {
+    if (!str || !other || str->length != other->length) {
+        return false;
+    }
+    return memcmp(str->data, other->data, str->length) == 0;
+}
+
+bool ds_string_equals_cstr(const ds_string* str, const char* cstr) {
+    if (!str || !cstr) {
+        return false;
+    }
+    size_t cstr_length = strlen(cstr);
+    if (str->length != cstr_length) {
+        return false;
+    }
+    return memcmp(str->data, cstr, str->length) == 0;
+}
+
 #endif
