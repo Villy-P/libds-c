@@ -2,17 +2,18 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #ifdef DS_PANIC_ON_MALLOC
-    #define DS_HANDLE_MALLOC_FAILURE(msg) \
+    #define DS_HANDLE_MALLOC_FAILURE(msg, retval) \
         do { \
             fprintf(stderr, "[LIB-DS-C FATAL] Out of memory: %s\n", msg); \
             exit(EXIT_FAILURE); \
         } while(0)
 #else
-    #define DS_HANDLE_MALLOC_FAILURE(msg) return nullptr
+    #define DS_HANDLE_MALLOC_FAILURE(msg, retval) return (retval)
 #endif
 
 typedef struct {
@@ -50,11 +51,11 @@ ds_array* ds_array_clone(const ds_array* array);
 ds_array* ds_array_create(size_t initial_capacity) {
     ds_array* array = (ds_array*)malloc(sizeof(ds_array));
     if (!array) {
-        DS_HANDLE_MALLOC_FAILURE("Failed to allocate memory for ds_array");
+        DS_HANDLE_MALLOC_FAILURE("Failed to allocate memory for ds_array", NULL);
     }
     if (!ds_array_init(array, initial_capacity)) {
         free(array);
-        DS_HANDLE_MALLOC_FAILURE("Failed to initialize ds_array");
+        DS_HANDLE_MALLOC_FAILURE("Failed to initialize ds_array", NULL);
     }
     return array;
 }
@@ -205,11 +206,11 @@ void ds_array_clear(ds_array* array) {
 
 ds_array* ds_array_clone(const ds_array* array) {
     if (!array) {
-        return nullptr;
+        return NULL;
     }
     ds_array* new_array = ds_array_create(array->capacity);
     if (!new_array) {
-        return nullptr;
+        return NULL;
     }
     memcpy((void*)new_array->data, (void*)array->data, array->length * sizeof(void*));
     new_array->length = array->length;
