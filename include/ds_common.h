@@ -9,3 +9,6 @@
 #else
     #define DS_HANDLE_MALLOC_FAILURE(msg, retval) return (retval)
 #endif
+
+typedef int (*ds_cmp_fn)(const void*, const void*);
+typedef void (*ds_destroy_fn)(void*);
