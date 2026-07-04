@@ -278,11 +278,58 @@ DS_STATUS ds_array_remove(ds_array* array, size_t index, void* out);
  * @return DS_STATUS_INDEX_OUT_OF_BOUNDS if index is out of bounds
  * @return DS_STATUS_OVERFLOW if resizing the array would exceed `SIZE_MAX / member_size`
  * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails
+ *
+ * @see ds_array_push
+ *
+ * @memberof ds_array
  */
 DS_STATUS ds_array_pop(ds_array* array, void* out);
+/**
+ * @brief Checks if the array contains a specific element.
+ * 
+ * @param array The array to search. Must not be NULL.
+ * @param element The element to search for. Must not be NULL.
+ *
+ * @warning If cmp_fn is not defined, then contains will check the raw memory of the elements for equality. If cmp_fn is defined, it will be used to compare elements.
+ * 
+ * @return true if the element is found, false otherwise.
+ *
+ * @memberof ds_array
+ */
 bool ds_array_contains(const ds_array* array, const void* element);
+/**
+ * @brief Clears the array, removing all elements and resetting its length to 0. The capacity remains unchanged.
+ * 
+ * @param array The array to clear. Must not be NULL.
+ *
+ * @note If destroy_fn is defined, it will be called on each element before clearing the array.
+ *
+ * @memberof ds_array
+ */
 void ds_array_clear(ds_array* array);
-ds_array* ds_array_clone(const ds_array* array);
+/**
+ * @brief Returns a shallow copy of the array, duplicating the internal buffer but not the elements themselves.
+ * 
+ * @param array The array to copy. Must not be NULL.
+ * 
+ * @return ds_array* A pointer to the new array, or NULL if allocation fails.
+ *
+ * @see ds_array_deep_copy
+ *
+ * @memberof ds_array
+ */
+ds_array* ds_array_shallow_copy(const ds_array* array);
+/**
+ * @brief Reverses the array in place, so that the first element becomes the last and the last becomes the first.
+ * 
+ * @param array The array to reverse. Must not be NULL.
+ *
+ * @return DS_STATUS_OK on success
+ * @return DS_STATUS_IS_NULL if array is NULL
+ * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails during the reversal process
+ *
+ * @memberof ds_array 
+ */
 DS_STATUS ds_array_reverse(ds_array* array);
 
 /**
@@ -363,14 +410,18 @@ DS_STATUS ds_array_reverse(ds_array* array);
         ds_array_clear((ds_array*)array); \
     } \
     \
-    static inline name* name##_clone(const name* array) { \
-        return (name*)ds_array_clone((ds_array*)array); \
+    static inline name* name##_shallow_copy(const name* array) { \
+        return (name*)ds_array_shallow_copy((ds_array*)array); \
     } \
     \
     static inline DS_STATUS name##_reverse(name* array) { \
         return ds_array_reverse((ds_array*)array); \
     }
 
+/**
+ * @def DS_ARRAY_MIN_CAPACITY
+ * @brief Minimum capacity for dynamic arrays
+ */
 #define DS_ARRAY_MIN_CAPACITY 8
 
 #ifdef DS_C_IMPLEMENTATION
@@ -642,7 +693,7 @@ void ds_array_clear(ds_array* array) {
     }
 }
 
-ds_array* ds_array_clone(const ds_array* array) {
+ds_array* ds_array_shallow_copy(const ds_array* array) {
     if (!array) {
         DS_HANDLE_FAILURE("array is NULL", NULL);
     }

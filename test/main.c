@@ -120,17 +120,17 @@ static void test_array_null_safety() {
     printf("test_array_null_safety passed\n");
 }
 
-static void test_array_clone() {
+static void test_array_shallow_copy() {
     ds_int_array* arr = ds_int_array_create(4, NULL, NULL);
     int var = 5;
     ds_int_array_push(arr, var);
-    ds_int_array* clone = ds_int_array_clone(arr);
+    ds_int_array* clone = ds_int_array_shallow_copy(arr);
     assert(clone != NULL);
     assert(clone->length == arr->length);
     assert(ds_int_array_get(clone, 0) == ds_int_array_get(arr, 0));
     ds_int_array_destroy(arr);
     ds_int_array_destroy(clone);
-    printf("test_array_clone passed\n");
+    printf("test_array_shallow_copy passed\n");
 }
 
 static void test_array_reverse() {
@@ -157,7 +157,7 @@ int main() {
     test_array_destroy_with();
     // test_array_out_of_bounds();
     test_array_null_safety();
-    test_array_clone();
+    test_array_shallow_copy();
     test_array_reverse();
     printf("All tests passed\n");
     return 0;
