@@ -34,11 +34,11 @@ bool ds_string_equals_cstr(const ds_string* str, const char* cstr);
 ds_string* ds_string_create(const char* initial_data) {
     ds_string* str = (ds_string*)malloc(sizeof(ds_string));
     if (!str) {
-        DS_HANDLE_MALLOC_FAILURE("Failed to allocate memory for ds_string", NULL);
+        DS_HANDLE_FAILURE("Failed to allocate memory for ds_string", NULL);
     }
     if (!ds_string_init(str, initial_data)) {
         free(str);
-        DS_HANDLE_MALLOC_FAILURE("Failed to initialize ds_string", NULL);
+        DS_HANDLE_FAILURE("Failed to initialize ds_string", NULL);
     }
     return str;
 }
@@ -61,7 +61,7 @@ bool ds_string_init(ds_string* str, const char* initial_data) {
 
     str->data = (char*)malloc(initial_capacity);
     if (!str->data) {
-        DS_HANDLE_MALLOC_FAILURE("Failed to allocate memory for ds_string data", false);
+        DS_HANDLE_FAILURE("Failed to allocate memory for ds_string data", false);
     }
     if (initial_data) {
         memcpy(str->data, initial_data, initial_length);
@@ -85,7 +85,7 @@ bool ds_string_resize(ds_string* str, size_t new_capacity) {
     }
     char* new_data = (char*)realloc(str->data, new_capacity);
     if (!new_data) {
-        DS_HANDLE_MALLOC_FAILURE("Failed to reallocate memory for ds_string data", false);
+        DS_HANDLE_FAILURE("Failed to reallocate memory for ds_string data", false);
     }
     str->data = new_data;
     str->capacity = new_capacity;
