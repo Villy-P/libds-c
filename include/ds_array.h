@@ -151,12 +151,134 @@ void ds_array_destroy(ds_array* array);
  */
 DS_STATUS ds_array_resize(ds_array* array, size_t new_capacity);
 
-DS_STATUS ds_array_push_array(ds_array* array, const ds_array* other_array);
+/**
+ * @brief Adds an element to the end of the dynamic array.
+ * 
+ * @param array The array to which the element will be added. Must not be NULL.
+ * @param element Pointer to the element to add. Must not be NULL.
+ *  
+ * @return DS_STATUS_OK on success
+ * @return DS_STATUS_IS_NULL if array or element is NULL
+ * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails
+ * @return DS_STATUS_OVERFLOW if resizing the array would exceed `SIZE_MAX / member_size`
+ *
+ * @note The element is copied into the array, so the caller retains ownership of the original.
+ *
+ * @see ds_array_pop
+ * @see ds_array_insert
+ *
+ * @memberof ds_array
+ */
 DS_STATUS ds_array_push(ds_array* array, const void* element);
+/**
+ * @brief Adds all elements from another dynamic array to the end of this array.
+ * 
+ * @param array The array to which elements will be added. Must not be NULL.
+ * @param other_array The array from which elements will be copied. Must not be NULL and must be different from `array`.
+ * 
+ * @return DS_STATUS_OK on success
+ * @return DS_STATUS_IS_NULL if array or other_array is NULL
+ * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails
+ * @return DS_STATUS_OVERFLOW if resizing the array would exceed `SIZE_MAX / member_size`
+ * @return DS_STATUS_MEMBER_SIZE_MISMATCH if the member sizes of the two arrays do not match
+ * @return DS_STATUS_ERROR if both arrays are the same
+ *
+ * @note The elements are copied into the array, so the caller retains ownership of the originals.
+ * 
+ * @see ds_array_push
+ * @see ds_array_insert
+ *
+ * @memberof ds_array
+ */
+DS_STATUS ds_array_push_array(ds_array* array, const ds_array* other_array);
+/**
+ * @brief Inserts an element at a specific index in the dynamic array.
+ * 
+ * @param array The array to which the element will be inserted. Must not be NULL.
+ * @param index The index at which to insert the element. Must be a valid index (0 <= index < ds_array_size(array)).
+ * @param element Pointer to the element to insert. Must not be NULL.
+ *
+ * @return DS_STATUS_OK on success
+ * @return DS_STATUS_IS_NULL if array or element is NULL
+ * @return DS_STATUS_INDEX_OUT_OF_BOUNDS if index is out of bounds
+ * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails
+ * @return DS_STATUS_OVERFLOW if resizing the array would exceed `SIZE_MAX / member_size`
+ *
+ * @note The element is copied into the array, so the caller retains ownership of the original.
+ *
+ * @see ds_array_push
+ * @see ds_array_remove
+ *
+ * @memberof ds_array
+ */
 DS_STATUS ds_array_insert(ds_array* array, size_t index, const void* element);
+/**
+ * @brief Retrieves a pointer to the element at a specific index in the dynamic array.
+ * 
+ * @param array The array from which to retrieve the element. Must not be NULL.
+ * @param index The index of the element to retrieve. Must be a valid index (0 <= index < ds_array_size(array)).
+ *
+ * @return void* A pointer to the element at the specified index, or NULL if the index is out of bounds/the array is NULL.
+ * 
+ * @see ds_array_get_const
+ *
+ * @memberof ds_array
+ */
 void* ds_array_get(ds_array* array, size_t index);
+/**
+ * @brief Retrieves a const pointer to the element at a specific index in the dynamic array.
+ * 
+ * @param array The array from which to retrieve the element. Must not be NULL. 
+ * @param index The index of the element to retrieve. Must be a valid index (0 <= index < ds_array_size(array)).
+ *
+ * @return const void* A const pointer to the element at the specified index, or NULL if the index is out of bounds/the array is NULL. 
+ *
+ * @see ds_array_get
+ *
+ * @memberof ds_array
+ */
 const void* ds_array_get_const(const ds_array* array, size_t index);
+/**
+ * @brief Removes an element at a specific index from the dynamic array.
+ * 
+ * @param array The array from which to remove the element. Must not be NULL.
+ * @param index The index of the element to remove. Must be a valid index (0 <= index < ds_array_size(array)).
+ * @param out A pointer to a buffer where the removed element will be stored, or NULL if the element is not needed.
+ *
+ * @note If the array has a destroy function, it will be called on the removed element after it is copied to `out`.
+ * @note If the array's length is less than capacity / 4, the array will be resized to half its current capacity to save memory.
+ *
+ * @warning If the array does not have a destroy function and out is set to NULL, the removed element will be lost and may cause a memory leak if it was dynamically allocated.
+ *
+ * @return DS_STATUS_OK on success
+ * @return DS_STATUS_IS_NULL if array is NULL
+ * @return DS_STATUS_INDEX_OUT_OF_BOUNDS if index is out of bounds
+ * @return DS_STATUS_OVERFLOW if resizing the array would exceed `SIZE_MAX / member_size`
+ * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails
+ *
+ * @see ds_array_insert
+ * @see ds_array_pop
+ *
+ * @memberof ds_array
+ */
 DS_STATUS ds_array_remove(ds_array* array, size_t index, void* out);
+/**
+ * @brief Removes the last element from the dynamic array.
+ *
+ * @param array The array from which to remove the element. Must not be NULL.
+ * @param out A pointer to a buffer where the removed element will be stored, or NULL if the element is not needed.
+ *
+ * @note If the array has a destroy function, it will be called on the removed element after it is copied to `out`.
+ * @note If the array's length is less than capacity / 4, the array will be resized to half its current capacity to save memory.
+ *
+ * @warning If the array does not have a destroy function and out is set to NULL, the removed element will be lost and may cause a memory leak if it was dynamically allocated.
+ *
+ * @return DS_STATUS_OK on success
+ * @return DS_STATUS_IS_NULL if array is NULL
+ * @return DS_STATUS_INDEX_OUT_OF_BOUNDS if index is out of bounds
+ * @return DS_STATUS_OVERFLOW if resizing the array would exceed `SIZE_MAX / member_size`
+ * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails
+ */
 DS_STATUS ds_array_pop(ds_array* array, void* out);
 bool ds_array_contains(const ds_array* array, const void* element);
 void ds_array_clear(ds_array* array);
@@ -346,6 +468,21 @@ DS_STATUS ds_array_resize(ds_array* array, size_t new_capacity) {
     return DS_STATUS_OK;
 }
 
+DS_STATUS ds_array_push(ds_array* array, const void* element) {
+    if (!array || !element) {
+        DS_HANDLE_FAILURE("array or element is NULL", DS_STATUS_IS_NULL);
+    }
+    if (array->length >= array->capacity) {
+        DS_STATUS status = ds_array_resize(array, ds_array_grow(array->capacity));
+        if (status != DS_STATUS_OK) {
+            return status;
+        }
+    }
+    memcpy((char*)array->data + (array->length * array->member_size), element, array->member_size);
+    array->length++;
+    return DS_STATUS_OK;
+}
+
 DS_STATUS ds_array_push_array(ds_array* array, const ds_array* other_array) {
     if (!array || !other_array) {
         DS_HANDLE_FAILURE("array or other_array is NULL", DS_STATUS_IS_NULL);
@@ -378,21 +515,6 @@ DS_STATUS ds_array_push_array(ds_array* array, const ds_array* other_array) {
            other_array->length * array->member_size);
 
     array->length = new_total_length;
-    return DS_STATUS_OK;
-}
-
-DS_STATUS ds_array_push(ds_array* array, const void* element) {
-    if (!array || !element) {
-        DS_HANDLE_FAILURE("array or element is NULL", DS_STATUS_IS_NULL);
-    }
-    if (array->length >= array->capacity) {
-        DS_STATUS status = ds_array_resize(array, ds_array_grow(array->capacity));
-        if (status != DS_STATUS_OK) {
-            return status;
-        }
-    }
-    memcpy((char*)array->data + (array->length * array->member_size), element, array->member_size);
-    array->length++;
     return DS_STATUS_OK;
 }
 
