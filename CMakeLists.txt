@@ -24,9 +24,6 @@ FetchContent_MakeAvailable(doxygen-awesome-css)
 set(AWESOME_CSS_DIR ${doxygen-awesome-css_SOURCE_DIR})
 file(COPY ${AWESOME_CSS_DIR}/doxygen-awesome.css
      DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/docs/theme)
-set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile)
-set(DOXYFILE_OUT ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
-configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
 
 message(STATUS "Doxygen Awesome CSS: ${AWESOME_CSS_DIR}")
 
@@ -102,7 +99,7 @@ if (DS_ENABLE_ANALYSIS)
 endif()
 
 add_custom_target(docs
-    COMMAND doxygen ${DOXYFILE_OUT}
+    COMMAND doxygen ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Generating documentation"
     VERBATIM
