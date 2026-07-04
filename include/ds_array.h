@@ -45,24 +45,110 @@ typedef struct {
  *
  * @param initial_capacity The initial capacity of the array.
  * @param member_size The size of each element in bytes (use sizeof(T)).
- * @param cmp_fn The comparison function for elements.
- * @param destroy_fn The destructor function for elements.
+ * @param cmp_fn Optional comparison function for elements, NULL if not needed.
+ * @param destroy_fn Optional destructor function for elements, NULL if not needed.
  *
  * @return A pointer to the newly created array
- * @return NULL if memory allocation fails or if parameters are invalid.
+ * @return NULL if memory allocation fails, or if initial_capacity or member_size is 0.
  *
  * @note The caller is responsible for freeing the returned array using @ref ds_array_destroy().
  *
- * @see ds_array_destroy()
- * @see ds_array_init()
+ * @see ds_array_destroy
+ * @see ds_array_init
  * 
  * @memberof ds_array
  */
 ds_array* ds_array_create(size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn);
+/**
+ * @brief Initializes an existing dynamic array with the specified initial capacity and element size.
+ *
+ * Unlike @ref ds_array_create, this does not allocate the ds_array struct
+ * itself — the caller is responsible for providing it. Useful for stack
+ * allocated or embedded arrays.
+ * 
+ * @param array The array to initialize. Must not be NULL.
+ * @param initial_capacity The initial capacity of the array. Must be greater than 0.
+ * @param member_size Size of each element in bytes. Must be greater than 0.
+ * @param cmp_fn Optional comparison function for elements, NULL if not needed. 
+ * @param destroy_fn Optional destructor function for elements, NULL if not needed.
+ * 
+ * @return DS_STATUS_OK on success
+ * @return DS_STATUS_IS_NULL if array is NULL
+ * @return DS_STATUS_MEMBER_SIZE_0 if member_size is 0
+ * @return DS_STATUS_SIZE_0 if initial_capacity is 0
+ * @return DS_STATUS_OVERFLOW if initial_capacity exceeds `SIZE_MAX / member_size`
+ * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails
+ *
+ * @note Use @ref ds_array_deinit to free the internal buffer when done.
+ * 
+ * @see ds_array_deinit
+ * @see ds_array_destroy
+ * @see ds_array_init_default
+ * 
+ * @memberof ds_array
+ */
 DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn);
+/**
+ * @brief Initializes a dynamic array with default values.
+ * 
+ * @param array The array to initialize. Must not be NULL.
+ * @param member_size The size of each element in bytes. Must be greater than 0.
+ * 
+ * @return DS_STATUS_OK on success
+ * @return DS_STATUS_IS_NULL if array is NULL
+ * @return DS_STATUS_MEMBER_SIZE_0 if member_size is 0
+ * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation 
+ *
+ * @note Use @ref ds_array_deinit to free the internal buffer when done.
+ *
+ * @see ds_array_deinit
+ * @see ds_array_destroy
+ * @see ds_array_init
+ *
+ * @memberof ds_array
+ */
 DS_STATUS ds_array_init_default(ds_array* array, size_t member_size);
+/**
+ * @brief Deinitializes a dynamic array, freeing its internal buffer but not the array struct itself.
+ * 
+ * @param array The array to deinitialize. Must not be NULL.
+ * 
+ * @note Use @ref ds_array_destroy to free the array struct itself.
+ *
+ * @see ds_array_destroy
+ * @see ds_array_init
+ * @see ds_array_init_default
+ * 
+ * @memberof ds_array
+ */
 void ds_array_deinit(ds_array* array);
+/**
+ * @brief Destroys a dynamic array, freeing both its internal buffer and the array struct itself.
+ * 
+ * @param array The array to destroy. Must not be NULL.
+ *
+ * @note Use @ref ds_array_deinit if you only want to free the internal buffer.
+ *
+ * @see ds_array_deinit
+ * @see ds_array_init
+ * @see ds_array_init_default
+ *
+ * @memberof ds_array
+ */
 void ds_array_destroy(ds_array* array);
+/**
+ * @brief Resizes a dynamic array.
+ * 
+ * @param array The array to resize. Must not be NULL.
+ * @param new_capacity The new capacity for the array.
+ * 
+ * @return DS_STATUS_OK on success
+ * @return DS_STATUS_IS_NULL if array is NULL
+ * @return DS_STATUS_OVERFLOW if new_capacity exceeds `SIZE_MAX / member_size`
+ * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails
+ *
+ * @memberof ds_array
+ */
 DS_STATUS ds_array_resize(ds_array* array, size_t new_capacity);
 
 DS_STATUS ds_array_push_array(ds_array* array, const ds_array* other_array);
