@@ -1,5 +1,31 @@
-#pragma once
+/**
+ * @file ds_stack.h
+ * @brief Implementation of a generic stack in C, wrapping a dynamic array.
+ */
 
+/**
+ * @def DS_DEFINE_STACK_IMPLEMENTATION
+ * @brief Define this in exactly one .c file before including the header
+ *        to enable the implementation.
+ *
+ * @par Usage
+ * Only one translation unit should define this. Defining it in multiple
+ * .c files will cause linker errors due to duplicate symbols.
+ *
+ * @code
+ * // my_file.c
+ * #define DS_DEFINE_STACK_IMPLEMENTATION
+ * #include "ds_stack.h"
+ * @endcode
+ *
+ * @warning Defining this in a header file will cause duplicate symbol
+ *          errors at link time.
+ */
+#ifdef DOXYGEN
+    #define DS_DEFINE_STACK_IMPLEMENTATION
+#endif
+
+#pragma once
 
 #ifdef DS_DEFINE_STACK_IMPLEMETATION
 #include "ds_array.h"

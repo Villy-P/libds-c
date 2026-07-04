@@ -1,3 +1,8 @@
+/**
+ * @file ds_common.h
+ * @brief Contains project-wide declarations and definitions for the libds-c library.
+ */
+
 #pragma once
 
 #ifdef DS_PANIC_ON_MALLOC

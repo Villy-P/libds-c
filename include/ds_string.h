@@ -1,3 +1,8 @@
+/**
+ * @file ds_string.h
+ * @brief Implementation of a dynamic string in C, using `char*` to hold data.
+ */
+
 #pragma once
 
 #include "ds_common.h"
