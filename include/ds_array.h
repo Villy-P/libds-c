@@ -45,10 +45,16 @@ ds_array* ds_array_clone(const ds_array* array);
 DS_STATUS ds_array_reverse(ds_array* array);
 
 /**
- * @brief Defines a new array and function wrappers for type safe access.
+ * @brief Defines a typed array struct and all its functions.
+ * @param T    The element type (e.g. int, Token).
+ * @param name The name prefix for the generated functions.
  *
- * @param T The type of data this array will hold
- * @param name The name of the struct that will hold this data. For the best practice, use the type name prefixed by ds_: ds_int_array, ds_char_ptr_array, etc.
+ * @code
+ * DEFINE_DS_ARRAY(int, ds_int_array)
+ * ds_int_array arr;
+ * ds_int_array_init(&arr, 8, NULL, NULL);
+ * ds_int_array_push(&arr, 42);
+ * @endcode
  */
 #define DS_DEFINE_ARRAY(T, name) \
     typedef struct { struct { DS_ARRAY_FIELDS }; } name; \
