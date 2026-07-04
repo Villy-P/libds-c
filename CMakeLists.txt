@@ -17,6 +17,19 @@ fetchcontent_declare(cpptrace
 )
 fetchcontent_makeavailable(cpptrace)
 
+FetchContent_Declare(doxygen-awesome-css
+    URL https://github.com/jothepro/doxygen-awesome-css/archive/refs/heads/main.zip
+)
+FetchContent_MakeAvailable(doxygen-awesome-css)
+set(AWESOME_CSS_DIR ${doxygen-awesome-css_SOURCE_DIR})
+file(COPY ${AWESOME_CSS_DIR}/doxygen-awesome.css
+     DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/docs/theme)
+set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile)
+set(DOXYFILE_OUT ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
+configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
+
+message(STATUS "Doxygen Awesome CSS: ${AWESOME_CSS_DIR}")
+
 add_library(common_flags INTERFACE)
 
 target_compile_options(common_flags INTERFACE
@@ -87,6 +100,13 @@ if (DS_ENABLE_ANALYSIS)
         message(STATUS "cppcheck not found")
     endif()
 endif()
+
+add_custom_target(docs
+    COMMAND doxygen ${DOXYFILE_OUT}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating documentation"
+    VERBATIM
+)
 
 add_library(libds-c INTERFACE)
 add_library(libds-c::libds-c ALIAS libds-c)

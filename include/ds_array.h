@@ -1,3 +1,13 @@
+/**
+ * @file ds_array.h
+ * @author Valerius Petrini (valeriuspetrini@gmail.com)
+ * @brief Implementation of a generic dynamic array in C, using `void*` to hold data of any type.
+ * @version 0.1
+ * @date 2026-07-04
+ * 
+ * @copyright Copyright (c) 2026
+ */
+
 #pragma once
 
 #include "ds_common.h"

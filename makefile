@@ -50,6 +50,9 @@ cppcheck:
 
 analyze: lint cppcheck
 
+build-docs:
+	cmake --build $(BUILD_DIR) --target docs
+
 # Runs the program: Use this when you make changed
 run: build
 	@echo Running main executable...
@@ -74,3 +77,4 @@ help:
 	@echo "  lint        - Run clang-tidy"
 	@echo "  cppcheck    - Run cppcheck"
 	@echo "  analyze     - Run both analyzers"
+	@echo "  build-docs  - Build documentation using Doxygen"
