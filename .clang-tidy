@@ -16,7 +16,8 @@ Checks: >
   -clang-analyzer-security.VAList,
   -Wmacro-redefined,
   -hicpp-use-nullptr,
-  -modernize-use-nullptr
+  -modernize-use-nullptr,
+  -bugprone-macro-parentheses
 WarningsAsErrors: ''
 HeaderFilterRegex: '^(src|include)/.*'
 ExcludeHeaderFilterRegex: '.*(mingw|msys|ucrt|usr|clang|windows|build).*'

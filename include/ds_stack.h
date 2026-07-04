@@ -1,9 +1,10 @@
 #pragma once
 
+
+#ifdef DS_DEFINE_STACK_IMPLEMETATION
 #include "ds_array.h"
 #include "ds_common.h"
 
-#ifdef DS_DEFINE_STACK
 typedef ds_array ds_stack;
 
 #define DS_DEFINE_STACK(T, name) \

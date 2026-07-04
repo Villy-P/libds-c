@@ -41,7 +41,7 @@ static void test_array_basic() {
 
     assert(ds_int_array_remove(arr, TEST_ARRAY_INSERT_INDEX, NULL) != false);
     
-    ds_int_array_clear(arr, false);
+    ds_int_array_clear(arr);
     assert(arr->length == 0);
 
     ds_int_array_destroy(arr);

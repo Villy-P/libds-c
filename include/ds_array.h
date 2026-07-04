@@ -38,7 +38,7 @@ const void* ds_array_get_const(const ds_array* array, size_t index);
 bool ds_array_remove(ds_array* array, size_t index, void* out);
 bool ds_array_pop(ds_array* array, void* out);
 bool ds_array_contains(const ds_array* array, const void* element);
-void ds_array_clear(ds_array* array, bool free_elements);
+void ds_array_clear(ds_array* array);
 ds_array* ds_array_clone(const ds_array* array);
 bool ds_array_reverse(ds_array* array);
 
@@ -100,8 +100,8 @@ bool ds_array_reverse(ds_array* array);
         return ds_array_contains((ds_array*)array, &value); \
     } \
     \
-    static inline void name##_clear(name* array, bool free_elements) { \
-        ds_array_clear((ds_array*)array, free_elements); \
+    static inline void name##_clear(name* array) { \
+        ds_array_clear((ds_array*)array); \
     } \
     \
     static inline name* name##_clone(const name* array) { \
@@ -285,6 +285,8 @@ bool ds_array_remove(ds_array* array, size_t index, void* out) {
     void* removed_element = (char*)array->data + (index * array->member_size);
     if (out) {
         memcpy(out, removed_element, array->member_size);
+    } else if (array->destroy_fn) {
+        array->destroy_fn(removed_element);
     }
     memmove(
         (char*)array->data + (index * array->member_size), 
@@ -306,6 +308,8 @@ bool ds_array_pop(ds_array* array, void* out) {
     void* popped_element = (char*)array->data + ((array->length - 1) * array->member_size);
     if (out) {
         memcpy(out, popped_element, array->member_size);
+    } else if (array->destroy_fn) {
+        array->destroy_fn(popped_element);
     }
     array->length--;
     if (array->length > 0 &&
@@ -337,9 +341,9 @@ bool ds_array_contains(const ds_array* array, const void* element) {
     return false;
 }
 
-void ds_array_clear(ds_array* array, bool free_elements) {
+void ds_array_clear(ds_array* array) {
     if (array) {
-        if (free_elements && array->destroy_fn) {
+        if (array->destroy_fn) {
             for (size_t i = 0; i < array->length; ++i) {
                 void* item = (char*)array->data + (i * array->member_size);
                 array->destroy_fn(item);
