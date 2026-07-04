@@ -26,10 +26,38 @@
  * @brief A generic dynamic array, holding data using a `void*`
  */
 typedef struct {
+#ifdef DOXYGEN
+    void* data;               /**< Pointer to the internal buffer. */
+    size_t length;            /**< Number of elements currently stored. */
+    size_t capacity;          /**< Total allocated capacity in elements. */
+    size_t member_size;       /**< Size of each element in bytes. */
+    ds_cmp_fn cmp_fn;         /**< Optional comparison function. */
+    ds_destroy_fn destroy_fn; /**< Optional destructor for elements. */
+#else
     DS_ARRAY_FIELDS
+#endif
 } ds_array;
 
 // ----- FUNCTION DEFINITIONS -----
+
+/**
+ * @brief Creates a new dynamic array with the specified initial capacity and element size.
+ *
+ * @param initial_capacity The initial capacity of the array.
+ * @param member_size The size of each element in bytes (use sizeof(T)).
+ * @param cmp_fn The comparison function for elements.
+ * @param destroy_fn The destructor function for elements.
+ *
+ * @return A pointer to the newly created array
+ * @return NULL if memory allocation fails or if parameters are invalid.
+ *
+ * @note The caller is responsible for freeing the returned array using @ref ds_array_destroy().
+ *
+ * @see ds_array_destroy()
+ * @see ds_array_init()
+ * 
+ * @memberof ds_array
+ */
 ds_array* ds_array_create(size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn);
 DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn);
 DS_STATUS ds_array_init_default(ds_array* array, size_t member_size);
