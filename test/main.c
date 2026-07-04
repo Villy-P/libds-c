@@ -16,7 +16,7 @@ static const int TEST_ARRAY_INSERT_INDEX = 5;
 DS_DEFINE_ARRAY(int, ds_int_array);
 
 static void test_array_basic() {
-    ds_int_array* arr = ds_int_array_create(TEST_ARRAY_INITIAL_CAPACITY, NULL, NULL);
+    ds_int_array* arr = ds_int_array_create(TEST_ARRAY_INITIAL_CAPACITY, NULL, NULL, NULL);
     assert(arr != NULL);
     assert(arr->capacity == (size_t)TEST_ARRAY_INITIAL_CAPACITY);
     assert(arr->length == 0);
@@ -51,7 +51,7 @@ static void test_array_basic() {
 }
 
 static void test_array_growth_from_small_capacity() {
-    ds_int_array* arr = ds_int_array_create(1, NULL, NULL);
+    ds_int_array* arr = ds_int_array_create(1, NULL, NULL, NULL);
     int var1 = 1;
     int var2 = 2;
     int var3 = 3;
@@ -66,7 +66,7 @@ static void test_array_growth_from_small_capacity() {
 
 static void test_array_shrink_floor() {
     size_t initial = (size_t)(DS_ARRAY_MIN_CAPACITY * 4);
-    ds_int_array* arr = ds_int_array_create(initial, NULL, NULL);
+    ds_int_array* arr = ds_int_array_create(initial, NULL, NULL, NULL);
     int dummy = 0;
     for (size_t i = 0; i < initial; ++i) {
         assert(ds_int_array_push(arr, dummy) == DS_STATUS_OK);
@@ -80,7 +80,7 @@ static void test_array_shrink_floor() {
 }
 
 static void test_array_self_append_rejected() {
-    ds_int_array* arr = ds_int_array_create(4, NULL, NULL);
+    ds_int_array* arr = ds_int_array_create(4, NULL, NULL, NULL);
     int var = 1;
     ds_int_array_push(arr, var);
     assert(ds_int_array_push_array(arr, arr) == DS_STATUS_ERROR);
@@ -89,7 +89,7 @@ static void test_array_self_append_rejected() {
 }
 
 static void test_array_destroy_with() {
-    ds_int_array* arr = ds_int_array_create(4, NULL, NULL);
+    ds_int_array* arr = ds_int_array_create(4, NULL, NULL, NULL);
     ds_int_array_push(arr, 5);
     ds_int_array_push(arr, 10);
     ds_int_array_destroy(arr);
@@ -97,7 +97,7 @@ static void test_array_destroy_with() {
 }
 
 static void test_array_out_of_bounds() {
-    ds_int_array* arr = ds_int_array_create(4, NULL, NULL);
+    ds_int_array* arr = ds_int_array_create(4, NULL, NULL, NULL);
     int v = 1;
     assert(ds_int_array_get(arr, 0) == 0);
     assert(ds_int_array_get(arr, 100) == 0);
@@ -121,7 +121,7 @@ static void test_array_null_safety() {
 }
 
 static void test_array_shallow_copy() {
-    ds_int_array* arr = ds_int_array_create(4, NULL, NULL);
+    ds_int_array* arr = ds_int_array_create(4, NULL, NULL, NULL);
     int var = 5;
     ds_int_array_push(arr, var);
     ds_int_array* clone = ds_int_array_shallow_copy(arr);
@@ -134,7 +134,7 @@ static void test_array_shallow_copy() {
 }
 
 static void test_array_reverse() {
-    ds_int_array* arr = ds_int_array_create(5, NULL, NULL);
+    ds_int_array* arr = ds_int_array_create(5, NULL, NULL, NULL);
     int values[] = {1, 2, 3, 4, 5};
     for (int i = 0; i < 5; ++i) {
         ds_int_array_push(arr, values[i]);

@@ -3,6 +3,11 @@
  * @brief Implementation of a generic dynamic array in C, using `void*` to hold data of any type.
  */
 
+/**
+ * @defgroup array_api Dynamic Array API
+ * @brief Core dynamic array operations.
+ */
+
 #pragma once
 
 #include "ds_common.h"
@@ -21,9 +26,11 @@
     size_t member_size;       \
     ds_cmp_fn cmp_fn;         \
     ds_destroy_fn destroy_fn; \
+    ds_copy_fn copy_fn;
 
 /**
  * @brief A generic dynamic array, holding data using a `void*`
+ * @ingroup array_api
  */
 typedef struct {
 #ifdef DOXYGEN
@@ -33,6 +40,7 @@ typedef struct {
     size_t member_size;       /**< Size of each element in bytes. */
     ds_cmp_fn cmp_fn;         /**< Optional comparison function. */
     ds_destroy_fn destroy_fn; /**< Optional destructor for elements. */
+    ds_copy_fn copy_fn        /**< Optional copy function for elements. */
 #else
     DS_ARRAY_FIELDS
 #endif
@@ -47,18 +55,20 @@ typedef struct {
  * @param member_size The size of each element in bytes (use sizeof(T)).
  * @param cmp_fn Optional comparison function for elements, NULL if not needed.
  * @param destroy_fn Optional destructor function for elements, NULL if not needed.
+ * @param copy_fn Optional copy function for elements, NULL if not needed.
  *
  * @return A pointer to the newly created array
  * @return NULL if memory allocation fails, or if initial_capacity or member_size is 0.
  *
- * @note The caller is responsible for freeing the returned array using @ref ds_array_destroy().
+ * @note The caller is responsible for freeing the returned array using ds_array_destroy().
  *
  * @see ds_array_destroy
  * @see ds_array_init
  * 
  * @memberof ds_array
+ * @ingroup array_api
  */
-ds_array* ds_array_create(size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn);
+ds_array* ds_array_create(size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn, ds_copy_fn copy_fn);
 /**
  * @brief Initializes an existing dynamic array with the specified initial capacity and element size.
  *
@@ -71,6 +81,7 @@ ds_array* ds_array_create(size_t initial_capacity, size_t member_size, ds_cmp_fn
  * @param member_size Size of each element in bytes. Must be greater than 0.
  * @param cmp_fn Optional comparison function for elements, NULL if not needed. 
  * @param destroy_fn Optional destructor function for elements, NULL if not needed.
+ * @param copy_fn Optional copy function for elements, NULL if not needed.
  * 
  * @return DS_STATUS_OK on success
  * @return DS_STATUS_IS_NULL if array is NULL
@@ -86,8 +97,9 @@ ds_array* ds_array_create(size_t initial_capacity, size_t member_size, ds_cmp_fn
  * @see ds_array_init_default
  * 
  * @memberof ds_array
+ * @ingroup array_api
  */
-DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn);
+DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn, ds_copy_fn copy_fn);
 /**
  * @brief Initializes a dynamic array with default values.
  * 
@@ -106,6 +118,7 @@ DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity, size_t member_
  * @see ds_array_init
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 DS_STATUS ds_array_init_default(ds_array* array, size_t member_size);
 /**
@@ -120,6 +133,7 @@ DS_STATUS ds_array_init_default(ds_array* array, size_t member_size);
  * @see ds_array_init_default
  * 
  * @memberof ds_array
+ * @ingroup array_api
  */
 void ds_array_deinit(ds_array* array);
 /**
@@ -134,6 +148,7 @@ void ds_array_deinit(ds_array* array);
  * @see ds_array_init_default
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 void ds_array_destroy(ds_array* array);
 /**
@@ -148,6 +163,7 @@ void ds_array_destroy(ds_array* array);
  * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 DS_STATUS ds_array_resize(ds_array* array, size_t new_capacity);
 
@@ -168,6 +184,7 @@ DS_STATUS ds_array_resize(ds_array* array, size_t new_capacity);
  * @see ds_array_insert
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 DS_STATUS ds_array_push(ds_array* array, const void* element);
 /**
@@ -189,6 +206,7 @@ DS_STATUS ds_array_push(ds_array* array, const void* element);
  * @see ds_array_insert
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 DS_STATUS ds_array_push_array(ds_array* array, const ds_array* other_array);
 /**
@@ -210,6 +228,7 @@ DS_STATUS ds_array_push_array(ds_array* array, const ds_array* other_array);
  * @see ds_array_remove
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 DS_STATUS ds_array_insert(ds_array* array, size_t index, const void* element);
 /**
@@ -223,6 +242,7 @@ DS_STATUS ds_array_insert(ds_array* array, size_t index, const void* element);
  * @see ds_array_get_const
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 void* ds_array_get(ds_array* array, size_t index);
 /**
@@ -236,6 +256,7 @@ void* ds_array_get(ds_array* array, size_t index);
  * @see ds_array_get
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 const void* ds_array_get_const(const ds_array* array, size_t index);
 /**
@@ -260,6 +281,7 @@ const void* ds_array_get_const(const ds_array* array, size_t index);
  * @see ds_array_pop
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 DS_STATUS ds_array_remove(ds_array* array, size_t index, void* out);
 /**
@@ -282,6 +304,7 @@ DS_STATUS ds_array_remove(ds_array* array, size_t index, void* out);
  * @see ds_array_push
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 DS_STATUS ds_array_pop(ds_array* array, void* out);
 /**
@@ -295,6 +318,7 @@ DS_STATUS ds_array_pop(ds_array* array, void* out);
  * @return true if the element is found, false otherwise.
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 bool ds_array_contains(const ds_array* array, const void* element);
 /**
@@ -305,6 +329,7 @@ bool ds_array_contains(const ds_array* array, const void* element);
  * @note If destroy_fn is defined, it will be called on each element before clearing the array.
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 void ds_array_clear(ds_array* array);
 /**
@@ -317,6 +342,7 @@ void ds_array_clear(ds_array* array);
  * @see ds_array_deep_copy
  *
  * @memberof ds_array
+ * @ingroup array_api
  */
 ds_array* ds_array_shallow_copy(const ds_array* array);
 /**
@@ -329,6 +355,7 @@ ds_array* ds_array_shallow_copy(const ds_array* array);
  * @return DS_STATUS_ALLOC_FAIL if internal buffer allocation fails during the reversal process
  *
  * @memberof ds_array 
+ * @ingroup array_api
  */
 DS_STATUS ds_array_reverse(ds_array* array);
 
@@ -343,16 +370,18 @@ DS_STATUS ds_array_reverse(ds_array* array);
  * ds_int_array_init(&arr, 8, NULL, NULL);
  * ds_int_array_push(&arr, 42);
  * @endcode
+ *
+ * @ingroup array_api
  */
 #define DS_DEFINE_ARRAY(T, name) \
     typedef struct { struct { DS_ARRAY_FIELDS }; } name; \
     \
-    static inline name* name##_create(size_t initial_capacity, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn) { \
-        return (name*)ds_array_create(initial_capacity, sizeof(T), cmp_fn, destroy_fn); \
+    static inline name* name##_create(size_t initial_capacity, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn, ds_copy_fn copy_fn) { \
+        return (name*)ds_array_create(initial_capacity, sizeof(T), cmp_fn, destroy_fn, copy_fn); \
     } \
     \
-    static inline DS_STATUS name##_init(name* array, size_t initial_capacity, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn) { \
-        return ds_array_init((ds_array*)array, initial_capacity, sizeof(T), cmp_fn, destroy_fn); \
+    static inline DS_STATUS name##_init(name* array, size_t initial_capacity, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn, ds_copy_fn copy_fn) { \
+        return ds_array_init((ds_array*)array, initial_capacity, sizeof(T), cmp_fn, destroy_fn, copy_fn); \
     } \
     \
     static inline DS_STATUS name##_init_default(name* array) { \
@@ -421,6 +450,7 @@ DS_STATUS ds_array_reverse(ds_array* array);
 /**
  * @def DS_ARRAY_MIN_CAPACITY
  * @brief Minimum capacity for dynamic arrays
+ * @ingroup array_api
  */
 #define DS_ARRAY_MIN_CAPACITY 8
 
@@ -431,19 +461,19 @@ static size_t ds_array_grow(size_t capacity) {
 }
 
 // Implementation of ds_array functions
-ds_array* ds_array_create(size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn) {
+ds_array* ds_array_create(size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn, ds_copy_fn copy_fn) {
     ds_array* array = (ds_array*)malloc(sizeof(ds_array));
     if (!array) {
         DS_HANDLE_FAILURE("malloc for array failed", NULL);
     }
-    if (ds_array_init(array, initial_capacity, member_size, cmp_fn, destroy_fn) != DS_STATUS_OK) {
+    if (ds_array_init(array, initial_capacity, member_size, cmp_fn, destroy_fn, copy_fn) != DS_STATUS_OK) {
         free(array);
         DS_HANDLE_FAILURE("ds_array_init failed", NULL);
     }
     return array;
 }
 
-DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn) {
+DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn, ds_copy_fn copy_fn) {
     if (!array) {
         DS_HANDLE_FAILURE("array is NULL", DS_STATUS_IS_NULL);
     }
@@ -465,11 +495,12 @@ DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity, size_t member_
     array->capacity = initial_capacity;
     array->cmp_fn = cmp_fn;
     array->destroy_fn = destroy_fn;
+    array->copy_fn = copy_fn;
     return DS_STATUS_OK;
 }
 
 DS_STATUS ds_array_init_default(ds_array* array, size_t member_size) {
-    return ds_array_init(array, DS_ARRAY_MIN_CAPACITY, member_size, NULL, NULL);
+    return ds_array_init(array, DS_ARRAY_MIN_CAPACITY, member_size, NULL, NULL, NULL);
 }
 
 void ds_array_deinit(ds_array* array) {
@@ -697,7 +728,7 @@ ds_array* ds_array_shallow_copy(const ds_array* array) {
     if (!array) {
         DS_HANDLE_FAILURE("array is NULL", NULL);
     }
-    ds_array* new_array = ds_array_create(array->capacity, array->member_size, array->cmp_fn, array->destroy_fn);
+    ds_array* new_array = ds_array_create(array->capacity, array->member_size, array->cmp_fn, array->destroy_fn, array->copy_fn);
     if (!new_array) {
         DS_HANDLE_FAILURE("failed to create new array", NULL);
     }

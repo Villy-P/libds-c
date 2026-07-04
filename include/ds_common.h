@@ -3,19 +3,32 @@
  * @brief Contains project-wide declarations and definitions for the libds-c library.
  */
 
+/**
+ * @defgroup core_api Core API
+ * @brief Core functionality for the libds-c library.
+ */
+
 #pragma once
 
 /**
  * @brief Function pointer type for comparing two elements.
+ * @ingroup core_api
  */
 typedef int (*ds_cmp_fn)(const void*, const void*);
 /**
  * @brief Function pointer type for destroying an element, used for cleanup in data structures.
+ * @ingroup core_api
  */
 typedef void (*ds_destroy_fn)(void*);
+/**
+ * @brief Function pointer type for copying an element.
+ * @ingroup core_api
+ */
+typedef void* (*ds_copy_fn)(const void*);
 
 /**
  * @brief Enumeration of status codes used throughout the library.
+ * @ingroup core_api
  */
 typedef enum {
     DS_STATUS_OK,                    /**< Operation completed successfully. */
@@ -42,6 +55,7 @@ typedef enum {
  * @endcode
  *
  * @warning When defined, callers cannot recover from errors.
+ * @ingroup core_api
  */
 #ifdef DOXYGEN
     #define DS_THROWS_ERROR
@@ -61,8 +75,8 @@ typedef enum {
  * @param retval Value to return if not throwing.
  *
  * @see DS_THROWS_ERROR
+ * @ingroup core_api
  */
-
 #ifdef DS_THROWS_ERROR
     #define DS_HANDLE_FAILURE(msg, retval) \
         do { \
