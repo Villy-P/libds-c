@@ -17,31 +17,39 @@
     ds_cmp_fn cmp_fn;         \
     ds_destroy_fn destroy_fn; \
 
+/**
+ * @brief A generic dynamic array, holding data using a `void*`
+ */
 typedef struct {
     DS_ARRAY_FIELDS
 } ds_array;
 
-
 // ----- FUNCTION DEFINITIONS -----
 ds_array* ds_array_create(size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn);
-bool ds_array_init(ds_array* array, size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn);
-bool ds_array_init_default(ds_array* array, size_t member_size);
+DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn);
+DS_STATUS ds_array_init_default(ds_array* array, size_t member_size);
 void ds_array_deinit(ds_array* array);
 void ds_array_destroy(ds_array* array);
-bool ds_array_resize(ds_array* array, size_t new_capacity);
+DS_STATUS ds_array_resize(ds_array* array, size_t new_capacity);
 
-bool ds_array_push_array(ds_array* array, const ds_array* other_array);
-bool ds_array_push(ds_array* array, const void* element);
-bool ds_array_insert(ds_array* array, size_t index, const void* element);
+DS_STATUS ds_array_push_array(ds_array* array, const ds_array* other_array);
+DS_STATUS ds_array_push(ds_array* array, const void* element);
+DS_STATUS ds_array_insert(ds_array* array, size_t index, const void* element);
 void* ds_array_get(ds_array* array, size_t index);
 const void* ds_array_get_const(const ds_array* array, size_t index);
-bool ds_array_remove(ds_array* array, size_t index, void* out);
-bool ds_array_pop(ds_array* array, void* out);
+DS_STATUS ds_array_remove(ds_array* array, size_t index, void* out);
+DS_STATUS ds_array_pop(ds_array* array, void* out);
 bool ds_array_contains(const ds_array* array, const void* element);
 void ds_array_clear(ds_array* array);
 ds_array* ds_array_clone(const ds_array* array);
-bool ds_array_reverse(ds_array* array);
+DS_STATUS ds_array_reverse(ds_array* array);
 
+/**
+ * @brief Defines a new array and function wrappers for type safe access.
+ *
+ * @param T The type of data this array will hold
+ * @param name The name of the struct that will hold this data. For the best practice, use the type name prefixed by ds_: ds_int_array, ds_char_ptr_array, etc.
+ */
 #define DS_DEFINE_ARRAY(T, name) \
     typedef struct { struct { DS_ARRAY_FIELDS }; } name; \
     \
@@ -49,11 +57,11 @@ bool ds_array_reverse(ds_array* array);
         return (name*)ds_array_create(initial_capacity, sizeof(T), cmp_fn, destroy_fn); \
     } \
     \
-    static inline bool name##_init(name* array, size_t initial_capacity, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn) { \
+    static inline DS_STATUS name##_init(name* array, size_t initial_capacity, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn) { \
         return ds_array_init((ds_array*)array, initial_capacity, sizeof(T), cmp_fn, destroy_fn); \
     } \
     \
-    static inline bool name##_init_default(name* array) { \
+    static inline DS_STATUS name##_init_default(name* array) { \
         return ds_array_init_default((ds_array*)array, sizeof(T)); \
     } \
     \
@@ -64,35 +72,39 @@ bool ds_array_reverse(ds_array* array);
     static inline void name##_destroy(name* array) { \
         ds_array_destroy((ds_array*)array); \
     } \
-    static inline bool name##_resize(name* array, size_t new_capacity) { \
+    static inline DS_STATUS name##_resize(name* array, size_t new_capacity) { \
         return ds_array_resize((ds_array*)array, new_capacity); \
     } \
     \
-    static inline bool name##_push(name* array, T value) { \
+    static inline DS_STATUS name##_push(name* array, T value) { \
         return ds_array_push((ds_array*)array, &value); \
     } \
     \
-    static inline bool name##_push_array(name* array, const name* other_array) { \
+    static inline DS_STATUS name##_push_array(name* array, const name* other_array) { \
         return ds_array_push_array((ds_array*)array, (const ds_array*)other_array); \
     } \
     \
-    static inline bool name##_insert(name* array, size_t index, T value) { \
+    static inline DS_STATUS name##_insert(name* array, size_t index, T value) { \
         return ds_array_insert((ds_array*)array, index, &value); \
     } \
     \
     static inline T name##_get(name* array, size_t index) { \
+        assert(array != NULL); \
+        assert(index < ((ds_array*)array)->length); \
         return (*(T*)ds_array_get((ds_array*)array, index)); \
     } \
     \
     static inline const T name##_get_const(const name* array, size_t index) { \
+        assert(array != NULL); \
+        assert(index < ((ds_array*)array)->length); \
         return (*(const T*)ds_array_get_const((ds_array*)array, index)); \
     } \
     \
-    static inline bool name##_remove(name* array, size_t index, T* out) { \
+    static inline DS_STATUS name##_remove(name* array, size_t index, T* out) { \
         return ds_array_remove((ds_array*)array, index, out); \
     } \
     \
-    static inline bool name##_pop(name* array, T* out) { \
+    static inline DS_STATUS name##_pop(name* array, T* out) { \
         return ds_array_pop((ds_array*)array, out); \
     } \
     \
@@ -108,7 +120,7 @@ bool ds_array_reverse(ds_array* array);
         return (name*)ds_array_clone((ds_array*)array); \
     } \
     \
-    static inline bool name##_reverse(name* array) { \
+    static inline DS_STATUS name##_reverse(name* array) { \
         return ds_array_reverse((ds_array*)array); \
     }
 
@@ -124,35 +136,41 @@ static size_t ds_array_grow(size_t capacity) {
 ds_array* ds_array_create(size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn) {
     ds_array* array = (ds_array*)malloc(sizeof(ds_array));
     if (!array) {
-        DS_HANDLE_MALLOC_FAILURE("Failed to allocate memory for ds_array", NULL);
+        DS_HANDLE_FAILURE("malloc for array failed", NULL);
     }
-    if (!ds_array_init(array, initial_capacity, member_size, cmp_fn, destroy_fn)) {
+    if (ds_array_init(array, initial_capacity, member_size, cmp_fn, destroy_fn) != DS_STATUS_OK) {
         free(array);
-        DS_HANDLE_MALLOC_FAILURE("Failed to initialize ds_array", NULL);
+        DS_HANDLE_FAILURE("ds_array_init failed", NULL);
     }
     return array;
 }
 
-bool ds_array_init(ds_array* array, size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn) {
-    if (!array || member_size == 0 || initial_capacity == 0) {
-        return false;
+DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity, size_t member_size, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn) {
+    if (!array) {
+        DS_HANDLE_FAILURE("array is NULL", DS_STATUS_IS_NULL);
+    }
+    if (member_size == 0) {
+        DS_HANDLE_FAILURE("member size is 0", DS_STATUS_MEMBER_SIZE_0);
+    }
+    if (initial_capacity == 0) {
+        DS_HANDLE_FAILURE("initial capacity is 0", DS_STATUS_SIZE_0);
     }
     if (initial_capacity > SIZE_MAX / member_size) {
-        return false;
+        DS_HANDLE_FAILURE("initial capacity too large", DS_STATUS_OVERFLOW);
     }
     array->data = malloc(initial_capacity * member_size);
     if (!array->data) {
-        return false;
+        DS_HANDLE_FAILURE("array data initialization failed", DS_STATUS_ALLOC_FAIL);
     }
     array->member_size = member_size;
     array->length = 0;
     array->capacity = initial_capacity;
     array->cmp_fn = cmp_fn;
     array->destroy_fn = destroy_fn;
-    return true;
+    return DS_STATUS_OK;
 }
 
-bool ds_array_init_default(ds_array* array, size_t member_size) {
+DS_STATUS ds_array_init_default(ds_array* array, size_t member_size) {
     return ds_array_init(array, DS_ARRAY_MIN_CAPACITY, member_size, NULL, NULL);
 }
 
@@ -178,12 +196,12 @@ void ds_array_destroy(ds_array* array) {
     }
 }
 
-bool ds_array_resize(ds_array* array, size_t new_capacity) {
+DS_STATUS ds_array_resize(ds_array* array, size_t new_capacity) {
     if (!array) {
-        return false;
+        DS_HANDLE_FAILURE("array is NULL", DS_STATUS_IS_NULL);
     }
     if (new_capacity > SIZE_MAX / array->member_size) {
-        return false;
+        DS_HANDLE_FAILURE("new capacity too large", DS_STATUS_OVERFLOW);
     }
     if (new_capacity < array->length && array->destroy_fn) {
         for (size_t i = new_capacity; i < array->length; i++) {
@@ -193,22 +211,28 @@ bool ds_array_resize(ds_array* array, size_t new_capacity) {
     }
     void* new_data = realloc(array->data, new_capacity * array->member_size);
     if (!new_data) {
-        return false;
+        DS_HANDLE_FAILURE("array data resize failed", DS_STATUS_ALLOC_FAIL);
     }
     array->data = new_data;
     array->capacity = new_capacity;
     if (array->length > new_capacity) {
         array->length = new_capacity;
     }
-    return true;
+    return DS_STATUS_OK;
 }
 
-bool ds_array_push_array(ds_array* array, const ds_array* other_array) {
-    if (!array || !other_array || other_array->length == 0 || array->member_size != other_array->member_size) {
-        return false;
+DS_STATUS ds_array_push_array(ds_array* array, const ds_array* other_array) {
+    if (!array || !other_array) {
+        DS_HANDLE_FAILURE("array or other_array is NULL", DS_STATUS_IS_NULL);
+    }
+    if (other_array->length == 0) {
+        return DS_STATUS_OK;
+    }
+    if (array->member_size != other_array->member_size) {
+        DS_HANDLE_FAILURE("member sizes do not match", DS_STATUS_MEMBER_SIZE_MISMATCH);
     }
     if (array == other_array) {
-        return false;
+        DS_HANDLE_FAILURE("array and other_array are the same", DS_STATUS_ERROR);
     }
 
     size_t new_total_length = array->length + other_array->length;
@@ -218,8 +242,9 @@ bool ds_array_push_array(ds_array* array, const ds_array* other_array) {
         while (new_cap < needed) {
             new_cap = ds_array_grow(new_cap);
         }
-        if (!ds_array_resize(array, new_cap)) {
-            return false;
+        DS_STATUS resize_status = ds_array_resize(array, new_cap);
+        if (resize_status != DS_STATUS_OK) {
+            return resize_status;
         }
     }
 
@@ -228,30 +253,35 @@ bool ds_array_push_array(ds_array* array, const ds_array* other_array) {
            other_array->length * array->member_size);
 
     array->length = new_total_length;
-    return true;
+    return DS_STATUS_OK;
 }
 
-bool ds_array_push(ds_array* array, const void* element) {
+DS_STATUS ds_array_push(ds_array* array, const void* element) {
     if (!array || !element) {
-        return false;
+        DS_HANDLE_FAILURE("array or element is NULL", DS_STATUS_IS_NULL);
     }
     if (array->length >= array->capacity) {
-        if (!ds_array_resize(array, ds_array_grow(array->capacity))) {
-            return false;
+        DS_STATUS status = ds_array_resize(array, ds_array_grow(array->capacity));
+        if (status != DS_STATUS_OK) {
+            return status;
         }
     }
     memcpy((char*)array->data + (array->length * array->member_size), element, array->member_size);
     array->length++;
-    return true;
+    return DS_STATUS_OK;
 }
 
-bool ds_array_insert(ds_array* array, size_t index, const void* element) {
-    if (!array || !element || index > array->length) {
-        return false;
+DS_STATUS ds_array_insert(ds_array* array, size_t index, const void* element) {
+    if (!array || !element) {
+        DS_HANDLE_FAILURE("array or element is NULL", DS_STATUS_IS_NULL);
+    }
+    if (index > array->length) {
+        DS_HANDLE_FAILURE("index is out of bounds", DS_STATUS_OUT_OF_BOUNDS);
     }
     if (array->length >= array->capacity) {
-        if (!ds_array_resize(array, ds_array_grow(array->capacity))) {
-            return false;
+        DS_STATUS status = ds_array_resize(array, ds_array_grow(array->capacity));
+        if (status != DS_STATUS_OK) {
+            return status;
         }
     }
     memmove(
@@ -261,7 +291,7 @@ bool ds_array_insert(ds_array* array, size_t index, const void* element) {
         array->member_size);
     memcpy((char*)array->data + (index * array->member_size), element, array->member_size);
     array->length++;
-    return true;
+    return DS_STATUS_OK;
 }
 
 void* ds_array_get(ds_array* array, size_t index) {
@@ -278,9 +308,12 @@ const void* ds_array_get_const(const ds_array* array, size_t index) {
     return (const char*)array->data + (index * array->member_size);
 }
 
-bool ds_array_remove(ds_array* array, size_t index, void* out) {
-    if (!array || index >= array->length) {
-        return false;
+DS_STATUS ds_array_remove(ds_array* array, size_t index, void* out) {
+    if (!array) {
+        DS_HANDLE_FAILURE("array is NULL", DS_STATUS_IS_NULL);
+    }
+    if (index >= array->length) {
+        DS_HANDLE_FAILURE("index is out of bounds", DS_STATUS_OUT_OF_BOUNDS);
     }
     void* removed_element = (char*)array->data + (index * array->member_size);
     if (out) {
@@ -296,14 +329,20 @@ bool ds_array_remove(ds_array* array, size_t index, void* out) {
     if (array->length > 0 &&
         array->length < array->capacity / 4 &&
         array->capacity / 2 >= DS_ARRAY_MIN_CAPACITY) {
-        ds_array_resize(array, array->capacity / 2);
+        DS_STATUS status = ds_array_resize(array, array->capacity / 2);
+        if (status != DS_STATUS_OK) {
+            return status;
+        }
     }
-    return true;
+    return DS_STATUS_OK;
 }
 
-bool ds_array_pop(ds_array* array, void* out) {
-    if (!array || array->length == 0) {
-        return false;
+DS_STATUS ds_array_pop(ds_array* array, void* out) {
+    if (!array) {
+        DS_HANDLE_FAILURE("array is NULL", DS_STATUS_IS_NULL);
+    }
+    if (array->length == 0) {
+        DS_HANDLE_FAILURE("array is empty", DS_STATUS_OUT_OF_BOUNDS);
     }
     void* popped_element = (char*)array->data + ((array->length - 1) * array->member_size);
     if (out) {
@@ -315,7 +354,10 @@ bool ds_array_pop(ds_array* array, void* out) {
     if (array->length > 0 &&
         array->length < array->capacity / 4 &&
         array->capacity / 2 >= DS_ARRAY_MIN_CAPACITY) {
-        ds_array_resize(array, array->capacity / 2);
+        DS_STATUS status = ds_array_resize(array, array->capacity / 2);
+        if (status != DS_STATUS_OK) {
+            return status;
+        }
     }
     return true;
 }
@@ -355,27 +397,27 @@ void ds_array_clear(ds_array* array) {
 
 ds_array* ds_array_clone(const ds_array* array) {
     if (!array) {
-        return NULL;
+        DS_HANDLE_FAILURE("array is NULL", NULL);
     }
     ds_array* new_array = ds_array_create(array->capacity, array->member_size, array->cmp_fn, array->destroy_fn);
     if (!new_array) {
-        return NULL;
+        DS_HANDLE_FAILURE("failed to create new array", NULL);
     }
     memcpy(new_array->data, array->data, array->length * array->member_size);
     new_array->length = array->length;
     return new_array;
 }
 
-bool ds_array_reverse(ds_array* array) {
+DS_STATUS ds_array_reverse(ds_array* array) {
     if (!array) {
-        return false;
+        DS_HANDLE_FAILURE("array is NULL", DS_STATUS_IS_NULL);
     }
     if (array->length < 2) {
-        return true;
+        return DS_STATUS_OK;
     }
     void* temp = malloc(array->member_size);
     if (!temp) {
-        DS_HANDLE_MALLOC_FAILURE("Failed to allocate memory for reversing array", false);
+        DS_HANDLE_FAILURE("failed to allocate memory", DS_STATUS_ALLOC_FAIL);
     }
     for (size_t i = 0; i < array->length / 2; ++i) {
         memcpy(temp, (char*)array->data + (i * array->member_size), array->member_size);
@@ -383,6 +425,6 @@ bool ds_array_reverse(ds_array* array) {
         memcpy((char*)array->data + ((array->length - 1 - i) * array->member_size), temp, array->member_size);
     }
     free(temp);
-    return true;
+    return DS_STATUS_OK;
 }
 #endif
