@@ -19,11 +19,11 @@ typedef struct {
 
 // ----- FUNCTION DEFINITIONS -----
 ds_string* ds_string_create(const char* initial_data);
-bool ds_string_init(ds_string* str, const char* initial_data);
+DS_STATUS ds_string_init(ds_string* str, const char* initial_data);
 void ds_string_destroy(ds_string* str);
-bool ds_string_resize(ds_string* str, size_t new_capacity);
+DS_STATUS ds_string_resize(ds_string* str, size_t new_capacity);
 
-bool ds_string_append(ds_string* str, const char* suffix);
+DS_STATUS ds_string_append(ds_string* str, const char* suffix);
 bool ds_string_equals(const ds_string* str, const ds_string* other);
 bool ds_string_equals_cstr(const ds_string* str, const char* cstr);
 
@@ -43,13 +43,13 @@ ds_string* ds_string_create(const char* initial_data) {
     return str;
 }
 
-bool ds_string_init(ds_string* str, const char* initial_data) {
+DS_STATUS ds_string_init(ds_string* str, const char* initial_data) {
     if (!str) {
-        return false;
+        DS_HANDLE_FAILURE("String is NULL", DS_STATUS_IS_NULL);
     }
     size_t initial_length = initial_data ? strlen(initial_data) : 0;
     if (initial_length == SIZE_MAX) {
-        return false;
+        DS_HANDLE_FAILURE("String too large", DS_STATUS_OVERFLOW);
     }
     size_t initial_capacity = initial_length + 1;
 
@@ -69,7 +69,7 @@ bool ds_string_init(ds_string* str, const char* initial_data) {
     str->data[initial_length] = '\0';
     str->length = initial_length;
     str->capacity = initial_capacity;
-    return true;
+    return DS_STATUS_OK;
 }
 
 void ds_string_destroy(ds_string* str) {
@@ -79,9 +79,12 @@ void ds_string_destroy(ds_string* str) {
     }
 }
 
-bool ds_string_resize(ds_string* str, size_t new_capacity) {
-    if (!str || new_capacity <= str->capacity) {
-        return false;
+DS_STATUS ds_string_resize(ds_string* str, size_t new_capacity) {
+    if (!str) {
+        DS_HANDLE_FAILURE("String is NULL", DS_STATUS_IS_NULL);
+    }
+    if (new_capacity <= str->capacity) {
+        DS_HANDLE_FAILURE("New Capacity out of bounds for string", DS_STATUS_OUT_OF_BOUNDS);
     }
     char* new_data = (char*)realloc(str->data, new_capacity);
     if (!new_data) {
@@ -89,30 +92,31 @@ bool ds_string_resize(ds_string* str, size_t new_capacity) {
     }
     str->data = new_data;
     str->capacity = new_capacity;
-    return true;
+    return DS_STATUS_OK;
 }
 
-bool ds_string_append(ds_string* str, const char* suffix) {
+DS_STATUS ds_string_append(ds_string* str, const char* suffix) {
     if (!str || !suffix) {
-        return false;
+        DS_HANDLE_FAILURE("String or suffix is NULL", DS_STATUS_IS_NULL);
     }
     size_t suffix_length = strlen(suffix);
     if (suffix_length > SIZE_MAX - str->length) {
-        return false;
+        DS_HANDLE_FAILURE("String length too large", DS_STATUS_OVERFLOW);
     }
     size_t new_length = str->length + suffix_length;
 
     if (new_length + 1 > str->capacity) {
         size_t new_capacity = (new_length * 2) + 1;
-        if (!ds_string_resize(str, new_capacity)) {
-            return false;
+        DS_STATUS result = ds_string_resize(str, new_capacity);
+        if (result != DS_STATUS_OK) {
+            return result;
         }
     }
 
     memcpy(str->data + str->length, suffix, suffix_length);
     str->length = new_length;
     str->data[str->length] = '\0';
-    return true;
+    return DS_STATUS_OK;
 }
 
 bool ds_string_equals(const ds_string* str, const ds_string* other) {
