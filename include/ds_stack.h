@@ -105,6 +105,10 @@ typedef ds_array ds_stack;
             return (T){0}; /* Return a default value for the type */         \
         }                                                                    \
         return (*(T*)ds_array_get((ds_array*)stack, stack->length - 1));     \
+    }                                                                        \
+                                                                             \
+    static inline DS_STATUS name##_reverse(name* stack) {                    \
+        return ds_array_reverse((ds_array*)stack);                           \
     }
 
 /**
