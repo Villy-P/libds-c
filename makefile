@@ -1,6 +1,6 @@
 # Ensures commands run in one shell and prevent issues with file names
 .ONESHELL:
-.PHONY: setup setup-prod build build-prod run run-build-if clean rebuild production help
+.PHONY: setup setup-prod build build-prod run run-build-if clean rebuild production help precommit-install setup-dev clang-format clang-format-check
 
 # Sets up basic build variables
 BUILD_DIR := build
@@ -65,6 +65,17 @@ clean:
 rebuild: clean setup run
 production: clean setup-prod build-prod
 
+precommit-install:
+	pre-commit install
+
+setup-dev: setup precommit-install
+
+clang-format:
+	cmake --build $(BUILD_DIR) --target clang-format
+
+clang-format-check:
+	cmake --build $(BUILD_DIR) --target clang-format-check
+
 help:
 	@echo "Available targets:"
 	@echo "  setup       - Configure Debug build"
@@ -78,3 +89,7 @@ help:
 	@echo "  cppcheck    - Run cppcheck"
 	@echo "  analyze     - Run both analyzers"
 	@echo "  build-docs  - Build documentation using Doxygen"
+	@echo "  precommit-install - Install pre-commit hooks"
+	@echo "  setup-dev   - Setup development environment (setup + precommit-install)"
+	@echo "  clang-format - Format code using clang-format"
+	@echo "  clang-format-check - Check code formatting using clang-format"
