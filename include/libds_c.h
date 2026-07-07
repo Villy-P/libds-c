@@ -1,6 +1,7 @@
 /**
  * @file libds_c.h
- * @brief Central header file for the libds-c library, including all data structure headers.
+ * @brief Central header file for the libds-c library, including all data
+ * structure headers.
  */
 
 /**
@@ -20,12 +21,12 @@
  *          errors at link time.
  */
 #ifdef DOXYGEN
-    #define DS_C_IMPLEMENTATION
+#define DS_C_IMPLEMENTATION
 #endif
 
 #pragma once
 
 #include "ds_array.h"
-#include "ds_string.h"
 #include "ds_common.h"
 #include "ds_stack.h"
+#include "ds_string.h"

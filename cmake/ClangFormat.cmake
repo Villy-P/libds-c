@@ -7,8 +7,8 @@ find_program(CLANG_FORMAT_EXE NAMES clang-format clang-format-18 clang-format-17
 
 if(CLANG_FORMAT_EXE)
     file(GLOB_RECURSE FORMAT_SOURCES CONFIGURE_DEPENDS
-        ${CMAKE_SOURCE_DIR}/src/*.c
-        ${CMAKE_SOURCE_DIR}/src/*.cpp
+        ${CMAKE_SOURCE_DIR}/test/*.c
+        ${CMAKE_SOURCE_DIR}/test/*.cpp
         ${CMAKE_SOURCE_DIR}/include/*.h
         ${CMAKE_SOURCE_DIR}/include/*.hpp
     )

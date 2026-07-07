@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "ds_common.h"
-
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "ds_common.h"
 
 typedef struct {
     char* data;
@@ -61,7 +61,8 @@ DS_STATUS ds_string_init(ds_string* str, const char* initial_data) {
 
     str->data = (char*)malloc(initial_capacity);
     if (!str->data) {
-        DS_HANDLE_FAILURE("Failed to allocate memory for ds_string data", false);
+        DS_HANDLE_FAILURE("Failed to allocate memory for ds_string data",
+                          false);
     }
     if (initial_data) {
         memcpy(str->data, initial_data, initial_length);
@@ -84,11 +85,13 @@ DS_STATUS ds_string_resize(ds_string* str, size_t new_capacity) {
         DS_HANDLE_FAILURE("String is NULL", DS_STATUS_IS_NULL);
     }
     if (new_capacity <= str->capacity) {
-        DS_HANDLE_FAILURE("New Capacity out of bounds for string", DS_STATUS_OUT_OF_BOUNDS);
+        DS_HANDLE_FAILURE("New Capacity out of bounds for string",
+                          DS_STATUS_OUT_OF_BOUNDS);
     }
     char* new_data = (char*)realloc(str->data, new_capacity);
     if (!new_data) {
-        DS_HANDLE_FAILURE("Failed to reallocate memory for ds_string data", false);
+        DS_HANDLE_FAILURE("Failed to reallocate memory for ds_string data",
+                          false);
     }
     str->data = new_data;
     str->capacity = new_capacity;

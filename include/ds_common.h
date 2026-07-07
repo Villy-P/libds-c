@@ -1,6 +1,7 @@
 /**
  * @file ds_common.h
- * @brief Contains project-wide declarations and definitions for the libds-c library.
+ * @brief Contains project-wide declarations and definitions for the libds-c
+ * library.
  */
 
 /**
@@ -16,7 +17,8 @@
  */
 typedef int (*ds_cmp_fn)(const void*, const void*);
 /**
- * @brief Function pointer type for destroying an element, used for cleanup in data structures.
+ * @brief Function pointer type for destroying an element, used for cleanup in
+ * data structures.
  * @ingroup core_api
  */
 typedef void (*ds_destroy_fn)(void*);
@@ -31,15 +33,16 @@ typedef void* (*ds_copy_fn)(const void*);
  * @ingroup core_api
  */
 typedef enum {
-    DS_STATUS_OK,                    /**< Operation completed successfully. */
-    DS_STATUS_IS_NULL,               /**< A required pointer argument was NULL. */
-    DS_STATUS_SIZE_0,                /**< Size argument was 0. */
-    DS_STATUS_MEMBER_SIZE_0,         /**< Member size was 0. */
-    DS_STATUS_MEMBER_SIZE_MISMATCH,  /**< Member sizes of two arrays do not match. */
-    DS_STATUS_OVERFLOW,              /**< Operation would overflow size_t. */
-    DS_STATUS_ALLOC_FAIL,            /**< Memory allocation failed. */
-    DS_STATUS_OUT_OF_BOUNDS,         /**< Index exceeds array length. */
-    DS_STATUS_ERROR                  /**< Generic unrecoverable error. */
+    DS_STATUS_OK,            /**< Operation completed successfully. */
+    DS_STATUS_IS_NULL,       /**< A required pointer argument was NULL. */
+    DS_STATUS_SIZE_0,        /**< Size argument was 0. */
+    DS_STATUS_MEMBER_SIZE_0, /**< Member size was 0. */
+    DS_STATUS_MEMBER_SIZE_MISMATCH, /**< Member sizes of two arrays do not
+                                       match. */
+    DS_STATUS_OVERFLOW,             /**< Operation would overflow size_t. */
+    DS_STATUS_ALLOC_FAIL,           /**< Memory allocation failed. */
+    DS_STATUS_OUT_OF_BOUNDS,        /**< Index exceeds array length. */
+    DS_STATUS_ERROR                 /**< Generic unrecoverable error. */
 } DS_STATUS;
 
 /**
@@ -58,7 +61,7 @@ typedef enum {
  * @ingroup core_api
  */
 #ifdef DOXYGEN
-    #define DS_THROWS_ERROR
+#define DS_THROWS_ERROR
 #endif
 
 /**
@@ -78,12 +81,12 @@ typedef enum {
  * @ingroup core_api
  */
 #ifdef DS_THROWS_ERROR
-    #define DS_HANDLE_FAILURE(msg, retval) \
-        do { \
-            fprintf(stderr, "[LIB-DS-C FATAL] %s (%s:%d): %s\n", \
-                __func__, __FILE__, __LINE__, msg); \
-            exit(EXIT_FAILURE); \
-        } while(0)
+#define DS_HANDLE_FAILURE(msg, retval)                                 \
+    do {                                                               \
+        fprintf(stderr, "[LIB-DS-C FATAL] %s (%s:%d): %s\n", __func__, \
+                __FILE__, __LINE__, msg);                              \
+        exit(EXIT_FAILURE);                                            \
+    } while (0)
 #else
-    #define DS_HANDLE_FAILURE(msg, retval) return (retval)
+#define DS_HANDLE_FAILURE(msg, retval) return (retval)
 #endif

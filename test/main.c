@@ -1,11 +1,11 @@
 #define DS_C_IMPLEMENTATION
 // #define DS_THROWS_ERROR
-#include "ds_common.h"
-#include "ds_array.h"
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "ds_array.h"
+#include "ds_common.h"
 
 static const int TEST_ARRAY_INITIAL_CAPACITY = 10;
 static const int TEST_ARRAY_RESIZE_CAPACITY = 20;
@@ -16,12 +16,14 @@ static const int TEST_ARRAY_INSERT_INDEX = 5;
 DS_DEFINE_ARRAY(int, ds_int_array);
 
 static void test_array_basic() {
-    ds_int_array* arr = ds_int_array_create(TEST_ARRAY_INITIAL_CAPACITY, NULL, NULL, NULL);
+    ds_int_array* arr =
+        ds_int_array_create(TEST_ARRAY_INITIAL_CAPACITY, NULL, NULL, NULL);
     assert(arr != NULL);
     assert(arr->capacity == (size_t)TEST_ARRAY_INITIAL_CAPACITY);
     assert(arr->length == 0);
 
-    assert(ds_int_array_resize(arr, TEST_ARRAY_RESIZE_CAPACITY) == DS_STATUS_OK);
+    assert(ds_int_array_resize(arr, TEST_ARRAY_RESIZE_CAPACITY) ==
+           DS_STATUS_OK);
     assert(arr->capacity == (size_t)TEST_ARRAY_RESIZE_CAPACITY);
 
     int test_values[TEST_ARRAY_PUSH_COUNT];
@@ -37,12 +39,14 @@ static void test_array_basic() {
     }
 
     int insert_value = TEST_ARRAY_INSERT_VALUE;
-    assert(ds_int_array_insert(arr, TEST_ARRAY_INSERT_INDEX, insert_value) == DS_STATUS_OK);
+    assert(ds_int_array_insert(arr, TEST_ARRAY_INSERT_INDEX, insert_value) ==
+           DS_STATUS_OK);
     int retrieved_insert = ds_int_array_get(arr, TEST_ARRAY_INSERT_INDEX);
     assert(retrieved_insert == TEST_ARRAY_INSERT_VALUE);
 
-    assert(ds_int_array_remove(arr, TEST_ARRAY_INSERT_INDEX, NULL) == DS_STATUS_OK);
-    
+    assert(ds_int_array_remove(arr, TEST_ARRAY_INSERT_INDEX, NULL) ==
+           DS_STATUS_OK);
+
     ds_int_array_clear(arr);
     assert(arr->length == 0);
 
@@ -116,7 +120,7 @@ static void test_array_null_safety() {
     assert(ds_int_array_resize(NULL, 10) == DS_STATUS_IS_NULL);
     assert(ds_int_array_remove(NULL, 0, NULL) == DS_STATUS_IS_NULL);
     assert(ds_int_array_pop(NULL, NULL) == DS_STATUS_IS_NULL);
-    ds_int_array_destroy(NULL); // should not crash
+    ds_int_array_destroy(NULL);  // should not crash
     printf("test_array_null_safety passed\n");
 }
 
