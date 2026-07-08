@@ -418,25 +418,22 @@ DS_STATUS ds_array_reverse(ds_array* array);
  *
  * @ingroup array_api
  */
-#define DS_DEFINE_ARRAY(T, name)                                               \
+#define DS_DEFINE_ARRAY(T, name, DESTROY_FN, COPY_FN)                          \
     typedef struct {                                                           \
         struct {                                                               \
             DS_ARRAY_FIELDS                                                    \
         };                                                                     \
     } name;                                                                    \
                                                                                \
-    static inline name* name##_create(size_t initial_capacity,                 \
-                                      ds_destroy_fn destroy_fn,                \
-                                      ds_copy_fn copy_fn) {                    \
-        return (name*)ds_array_create(initial_capacity, sizeof(T), destroy_fn, \
-                                      copy_fn);                                \
+    static inline name* name##_create(size_t initial_capacity) {               \
+        return (name*)ds_array_create(initial_capacity, sizeof(T), DESTROY_FN, \
+                                      COPY_FN);                                \
     }                                                                          \
                                                                                \
-    static inline DS_STATUS name##_init(name* array, size_t initial_capacity,  \
-                                        ds_destroy_fn destroy_fn,              \
-                                        ds_copy_fn copy_fn) {                  \
+    static inline DS_STATUS name##_init(name* array,                           \
+                                        size_t initial_capacity) {             \
         return ds_array_init((ds_array*)array, initial_capacity, sizeof(T),    \
-                             destroy_fn, copy_fn);                             \
+                             DESTROY_FN, COPY_FN);                             \
     }                                                                          \
                                                                                \
     static inline DS_STATUS name##_init_default(name* array) {                 \

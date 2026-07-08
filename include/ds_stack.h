@@ -59,25 +59,22 @@ typedef ds_array ds_stack;
  *
  * @ingroup stack_api
  */
-#define DS_DEFINE_STACK(T, name)                                               \
+#define DS_DEFINE_STACK(T, name, DESTROY_FN, COPY_FN)                          \
     typedef struct {                                                           \
         struct {                                                               \
             DS_ARRAY_FIELDS                                                    \
         };                                                                     \
     } name;                                                                    \
                                                                                \
-    static inline name* name##_create(size_t initial_capacity,                 \
-                                      ds_destroy_fn destroy_fn,                \
-                                      ds_copy_fn copy_fn) {                    \
-        return (name*)ds_array_create(initial_capacity, sizeof(T), destroy_fn, \
-                                      copy_fn);                                \
+    static inline name* name##_create(size_t initial_capacity) {               \
+        return (name*)ds_array_create(initial_capacity, sizeof(T), DESTROY_FN, \
+                                      COPY_FN);                                \
     }                                                                          \
                                                                                \
-    static inline DS_STATUS name##_init(name* stack, size_t initial_capacity,  \
-                                        ds_destroy_fn destroy_fn,              \
-                                        ds_copy_fn copy_fn) {                  \
+    static inline DS_STATUS name##_init(name* stack,                           \
+                                        size_t initial_capacity) {             \
         return ds_array_init((ds_array*)stack, initial_capacity, sizeof(T),    \
-                             destroy_fn, copy_fn);                             \
+                             DESTROY_FN, COPY_FN);                             \
     }                                                                          \
                                                                                \
     static inline DS_STATUS name##_init_default(name* stack) {                 \
