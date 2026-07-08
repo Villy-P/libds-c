@@ -25,7 +25,6 @@
     size_t length;            \
     size_t capacity;          \
     size_t member_size;       \
-    ds_cmp_fn cmp_fn;         \
     ds_destroy_fn destroy_fn; \
     ds_copy_fn copy_fn;
 
@@ -39,7 +38,6 @@ typedef struct {
     size_t length;            /**< Number of elements currently stored. */
     size_t capacity;          /**< Total allocated capacity in elements. */
     size_t member_size;       /**< Size of each element in bytes. */
-    ds_cmp_fn cmp_fn;         /**< Optional comparison function. */
     ds_destroy_fn destroy_fn; /**< Optional destructor for elements. */
     ds_copy_fn copy_fn        /**< Optional copy function for elements. */
 #else
@@ -55,7 +53,6 @@ typedef struct {
  *
  * @param initial_capacity The initial capacity of the array.
  * @param member_size The size of each element in bytes (use sizeof(T)).
- * @param cmp_fn Optional comparison function for elements, NULL if not needed.
  * @param destroy_fn Optional destructor function for elements, NULL if not
  * needed.
  * @param copy_fn Optional copy function for elements, NULL if not needed.
@@ -74,8 +71,7 @@ typedef struct {
  * @ingroup array_api
  */
 ds_array* ds_array_create(size_t initial_capacity, size_t member_size,
-                          ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn,
-                          ds_copy_fn copy_fn);
+                          ds_destroy_fn destroy_fn, ds_copy_fn copy_fn);
 /**
  * @brief Initializes an existing dynamic array with the specified initial
  * capacity and element size.
@@ -88,7 +84,6 @@ ds_array* ds_array_create(size_t initial_capacity, size_t member_size,
  * @param initial_capacity The initial capacity of the array. Must be greater
  * than 0.
  * @param member_size Size of each element in bytes. Must be greater than 0.
- * @param cmp_fn Optional comparison function for elements, NULL if not needed.
  * @param destroy_fn Optional destructor function for elements, NULL if not
  * needed.
  * @param copy_fn Optional copy function for elements, NULL if not needed.
@@ -111,8 +106,8 @@ ds_array* ds_array_create(size_t initial_capacity, size_t member_size,
  * @ingroup array_api
  */
 DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity,
-                        size_t member_size, ds_cmp_fn cmp_fn,
-                        ds_destroy_fn destroy_fn, ds_copy_fn copy_fn);
+                        size_t member_size, ds_destroy_fn destroy_fn,
+                        ds_copy_fn copy_fn);
 /**
  * @brief Initializes a dynamic array with default values.
  *
@@ -356,17 +351,16 @@ DS_STATUS ds_array_pop(ds_array* array, void* out);
  *
  * @param array The array to search. Must not be NULL.
  * @param element The element to search for. Must not be NULL.
- *
- * @warning If cmp_fn is not defined, then contains will check the raw memory of
- * the elements for equality. If cmp_fn is defined, it will be used to compare
- * elements.
+ * @param cmp_fn Optional comparison function for elements. If NULL, memcmp will
+ * be used.
  *
  * @return true if the element is found, false otherwise.
  *
  * @memberof ds_array
  * @ingroup array_api
  */
-bool ds_array_contains(const ds_array* array, const void* element);
+bool ds_array_contains(const ds_array* array, const void* element,
+                       ds_cmp_fn cmp_fn);
 /**
  * @brief Clears the array, removing all elements and resetting its length to 0.
  * The capacity remains unchanged.
@@ -431,18 +425,18 @@ DS_STATUS ds_array_reverse(ds_array* array);
         };                                                                     \
     } name;                                                                    \
                                                                                \
-    static inline name* name##_create(                                         \
-        size_t initial_capacity, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn,   \
-        ds_copy_fn copy_fn) {                                                  \
-        return (name*)ds_array_create(initial_capacity, sizeof(T), cmp_fn,     \
-                                      destroy_fn, copy_fn);                    \
+    static inline name* name##_create(size_t initial_capacity,                 \
+                                      ds_destroy_fn destroy_fn,                \
+                                      ds_copy_fn copy_fn) {                    \
+        return (name*)ds_array_create(initial_capacity, sizeof(T), destroy_fn, \
+                                      copy_fn);                                \
     }                                                                          \
                                                                                \
-    static inline DS_STATUS name##_init(                                       \
-        name* array, size_t initial_capacity, ds_cmp_fn cmp_fn,                \
-        ds_destroy_fn destroy_fn, ds_copy_fn copy_fn) {                        \
+    static inline DS_STATUS name##_init(name* array, size_t initial_capacity,  \
+                                        ds_destroy_fn destroy_fn,              \
+                                        ds_copy_fn copy_fn) {                  \
         return ds_array_init((ds_array*)array, initial_capacity, sizeof(T),    \
-                             cmp_fn, destroy_fn, copy_fn);                     \
+                             destroy_fn, copy_fn);                             \
     }                                                                          \
                                                                                \
     static inline DS_STATUS name##_init_default(name* array) {                 \
@@ -495,8 +489,9 @@ DS_STATUS ds_array_reverse(ds_array* array);
         return ds_array_pop((ds_array*)array, out);                            \
     }                                                                          \
                                                                                \
-    static inline bool name##_contains(const name* array, T value) {           \
-        return ds_array_contains((ds_array*)array, &value);                    \
+    static inline bool name##_contains(const name* array, T value,             \
+                                       ds_cmp_fn cmp) {                        \
+        return ds_array_contains((ds_array*)array, &value, cmp);               \
     }                                                                          \
                                                                                \
     static inline void name##_clear(name* array) {                             \
@@ -527,13 +522,12 @@ static size_t ds_array_grow(size_t capacity) {
 
 // Implementation of ds_array functions
 ds_array* ds_array_create(size_t initial_capacity, size_t member_size,
-                          ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn,
-                          ds_copy_fn copy_fn) {
+                          ds_destroy_fn destroy_fn, ds_copy_fn copy_fn) {
     ds_array* array = (ds_array*)malloc(sizeof(ds_array));
     if (!array) {
         DS_HANDLE_FAILURE("malloc for array failed", NULL);
     }
-    if (ds_array_init(array, initial_capacity, member_size, cmp_fn, destroy_fn,
+    if (ds_array_init(array, initial_capacity, member_size, destroy_fn,
                       copy_fn) != DS_STATUS_OK) {
         free(array);
         DS_HANDLE_FAILURE("ds_array_init failed", NULL);
@@ -542,8 +536,8 @@ ds_array* ds_array_create(size_t initial_capacity, size_t member_size,
 }
 
 DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity,
-                        size_t member_size, ds_cmp_fn cmp_fn,
-                        ds_destroy_fn destroy_fn, ds_copy_fn copy_fn) {
+                        size_t member_size, ds_destroy_fn destroy_fn,
+                        ds_copy_fn copy_fn) {
     if (!array) {
         DS_HANDLE_FAILURE("array is NULL", DS_STATUS_IS_NULL);
     }
@@ -564,15 +558,13 @@ DS_STATUS ds_array_init(ds_array* array, size_t initial_capacity,
     array->member_size = member_size;
     array->length = 0;
     array->capacity = initial_capacity;
-    array->cmp_fn = cmp_fn;
     array->destroy_fn = destroy_fn;
     array->copy_fn = copy_fn;
     return DS_STATUS_OK;
 }
 
 DS_STATUS ds_array_init_default(ds_array* array, size_t member_size) {
-    return ds_array_init(array, DS_ARRAY_MIN_CAPACITY, member_size, NULL, NULL,
-                         NULL);
+    return ds_array_init(array, DS_ARRAY_MIN_CAPACITY, member_size, NULL, NULL);
 }
 
 void ds_array_deinit(ds_array* array) {
@@ -764,7 +756,8 @@ DS_STATUS ds_array_pop(ds_array* array, void* out) {
     return true;
 }
 
-bool ds_array_contains(const ds_array* array, const void* element) {
+bool ds_array_contains(const ds_array* array, const void* element,
+                       ds_cmp_fn cmp_fn) {
     if (!array || !element) {
         return false;
     }
@@ -772,8 +765,8 @@ bool ds_array_contains(const ds_array* array, const void* element) {
     for (size_t i = 0; i < array->length; ++i) {
         void* current = (char*)array->data + (i * array->member_size);
 
-        if (array->cmp_fn) {
-            if (array->cmp_fn(current, element) == 0) {
+        if (cmp_fn) {
+            if (cmp_fn(current, element) == 0) {
                 return true;
             }
         } else {
@@ -801,9 +794,8 @@ ds_array* ds_array_shallow_copy(const ds_array* array) {
     if (!array) {
         DS_HANDLE_FAILURE("array is NULL", NULL);
     }
-    ds_array* new_array =
-        ds_array_create(array->capacity, array->member_size, array->cmp_fn,
-                        array->destroy_fn, array->copy_fn);
+    ds_array* new_array = ds_array_create(array->capacity, array->member_size,
+                                          array->destroy_fn, array->copy_fn);
     if (!new_array) {
         DS_HANDLE_FAILURE("failed to create new array", NULL);
     }

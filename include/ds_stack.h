@@ -59,56 +59,56 @@ typedef ds_array ds_stack;
  *
  * @ingroup stack_api
  */
-#define DS_DEFINE_STACK(T, name)                                             \
-    typedef struct {                                                         \
-        struct {                                                             \
-            DS_ARRAY_FIELDS                                                  \
-        };                                                                   \
-    } name;                                                                  \
-                                                                             \
-    static inline name* name##_create(                                       \
-        size_t initial_capacity, ds_cmp_fn cmp_fn, ds_destroy_fn destroy_fn, \
-        ds_copy_fn copy_fn) {                                                \
-        return (name*)ds_array_create(initial_capacity, sizeof(T), cmp_fn,   \
-                                      destroy_fn, copy_fn);                  \
-    }                                                                        \
-                                                                             \
-    static inline DS_STATUS name##_init(                                     \
-        name* stack, size_t initial_capacity, ds_cmp_fn cmp_fn,              \
-        ds_destroy_fn destroy_fn, ds_copy_fn copy_fn) {                      \
-        return ds_array_init((ds_array*)stack, initial_capacity, sizeof(T),  \
-                             cmp_fn, destroy_fn, copy_fn);                   \
-    }                                                                        \
-                                                                             \
-    static inline DS_STATUS name##_init_default(name* stack) {               \
-        return ds_array_init_default((ds_array*)stack, sizeof(T));           \
-    }                                                                        \
-                                                                             \
-    static inline void name##_deinit(name* stack) {                          \
-        ds_array_deinit((ds_array*)stack);                                   \
-    }                                                                        \
-                                                                             \
-    static inline void name##_destroy(name* stack) {                         \
-        ds_array_destroy((ds_array*)stack);                                  \
-    }                                                                        \
-                                                                             \
-    static inline DS_STATUS name##_push(name* stack, T value) {              \
-        return ds_array_push((ds_array*)stack, &value);                      \
-    }                                                                        \
-                                                                             \
-    static inline DS_STATUS name##_pop(name* stack, T* out) {                \
-        return ds_array_pop((ds_array*)stack, out);                          \
-    }                                                                        \
-                                                                             \
-    static inline T name##_peek(name* stack) {                               \
-        if (!stack || stack->length == 0) {                                  \
-            return (T){0}; /* Return a default value for the type */         \
-        }                                                                    \
-        return (*(T*)ds_array_get((ds_array*)stack, stack->length - 1));     \
-    }                                                                        \
-                                                                             \
-    static inline DS_STATUS name##_reverse(name* stack) {                    \
-        return ds_array_reverse((ds_array*)stack);                           \
+#define DS_DEFINE_STACK(T, name)                                               \
+    typedef struct {                                                           \
+        struct {                                                               \
+            DS_ARRAY_FIELDS                                                    \
+        };                                                                     \
+    } name;                                                                    \
+                                                                               \
+    static inline name* name##_create(size_t initial_capacity,                 \
+                                      ds_destroy_fn destroy_fn,                \
+                                      ds_copy_fn copy_fn) {                    \
+        return (name*)ds_array_create(initial_capacity, sizeof(T), destroy_fn, \
+                                      copy_fn);                                \
+    }                                                                          \
+                                                                               \
+    static inline DS_STATUS name##_init(name* stack, size_t initial_capacity,  \
+                                        ds_destroy_fn destroy_fn,              \
+                                        ds_copy_fn copy_fn) {                  \
+        return ds_array_init((ds_array*)stack, initial_capacity, sizeof(T),    \
+                             destroy_fn, copy_fn);                             \
+    }                                                                          \
+                                                                               \
+    static inline DS_STATUS name##_init_default(name* stack) {                 \
+        return ds_array_init_default((ds_array*)stack, sizeof(T));             \
+    }                                                                          \
+                                                                               \
+    static inline void name##_deinit(name* stack) {                            \
+        ds_array_deinit((ds_array*)stack);                                     \
+    }                                                                          \
+                                                                               \
+    static inline void name##_destroy(name* stack) {                           \
+        ds_array_destroy((ds_array*)stack);                                    \
+    }                                                                          \
+                                                                               \
+    static inline DS_STATUS name##_push(name* stack, T value) {                \
+        return ds_array_push((ds_array*)stack, &value);                        \
+    }                                                                          \
+                                                                               \
+    static inline DS_STATUS name##_pop(name* stack, T* out) {                  \
+        return ds_array_pop((ds_array*)stack, out);                            \
+    }                                                                          \
+                                                                               \
+    static inline T name##_peek(name* stack) {                                 \
+        if (!stack || stack->length == 0) {                                    \
+            return (T){0}; /* Return a default value for the type */           \
+        }                                                                      \
+        return (*(T*)ds_array_get((ds_array*)stack, stack->length - 1));       \
+    }                                                                          \
+                                                                               \
+    static inline DS_STATUS name##_reverse(name* stack) {                      \
+        return ds_array_reverse((ds_array*)stack);                             \
     }
 
 /**
@@ -117,7 +117,6 @@ typedef ds_array ds_stack;
  *
  * @param initial_capacity The initial capacity of the stack.
  * @param member_size The size of each element in bytes.
- * @param cmp_fn Optional comparison function for elements, NULL if not needed.
  * @param destroy_fn Optional destructor function for elements, NULL if not
  * needed.
  * @param copy_fn Optional copy function for elements, NULL if not needed.
@@ -136,11 +135,10 @@ typedef ds_array ds_stack;
  * @ingroup stack_api
  */
 static inline ds_stack* ds_stack_create(size_t initial_capacity,
-                                        size_t member_size, ds_cmp_fn cmp_fn,
+                                        size_t member_size,
                                         ds_destroy_fn destroy_fn,
                                         ds_copy_fn copy_fn) {
-    return ds_array_create(initial_capacity, member_size, cmp_fn, destroy_fn,
-                           copy_fn);
+    return ds_array_create(initial_capacity, member_size, destroy_fn, copy_fn);
 }
 
 /**
@@ -151,7 +149,6 @@ static inline ds_stack* ds_stack_create(size_t initial_capacity,
  * @param initial_capacity The initial capacity of the stack. Must be greater
  * than 0.
  * @param member_size The size of each element in bytes. Must be greater than 0.
- * @param cmp_fn Optional comparison function for elements, NULL if not needed.
  * @param destroy_fn Optional destructor function for elements, NULL if not
  * needed.
  * @param copy_fn Optional copy function for elements, NULL if not needed.
@@ -174,11 +171,11 @@ static inline ds_stack* ds_stack_create(size_t initial_capacity,
  * @ingroup stack_api
  */
 static inline DS_STATUS ds_stack_init(ds_stack* stack, size_t initial_capacity,
-                                      size_t member_size, ds_cmp_fn cmp_fn,
+                                      size_t member_size,
                                       ds_destroy_fn destroy_fn,
                                       ds_copy_fn copy_fn) {
-    return ds_array_init(stack, initial_capacity, member_size, cmp_fn,
-                         destroy_fn, copy_fn);
+    return ds_array_init(stack, initial_capacity, member_size, destroy_fn,
+                         copy_fn);
 }
 
 /**
