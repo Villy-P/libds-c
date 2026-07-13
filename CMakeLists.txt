@@ -11,23 +11,7 @@ file(GLOB_RECURSE LIBDS_C_TEST_SOURCES CONFIGURE_DEPENDS "test/*.c")
 list(FILTER LIBDS_C_TEST_SOURCES EXCLUDE REGEX ".*src/main.c$")
 
 include(cmake/Dependencies.cmake)
-
-add_library(common_flags INTERFACE)
-
-target_compile_options(common_flags INTERFACE
-    -Wall 
-    -Wextra 
-    -g 
-    -O0
-    $<$<PLATFORM_ID:Windows>:-gcodeview>
-    $<$<CONFIG:Debug>:-fdiagnostics-color=always>
-)
-
-target_link_options(common_flags INTERFACE
-    -g
-    $<$<PLATFORM_ID:Windows>:-Wl,--export-all-symbols>
-    $<$<PLATFORM_ID:Windows>:-Wl,--enable-auto-image-base>
-)
+include(cmake/CompilerFlags.cmake)
 
 add_executable(${EXEC_NAME_TEST} ${LIBDS_C_TEST_SOURCES})
 target_include_directories(${EXEC_NAME_TEST} PRIVATE include/)
