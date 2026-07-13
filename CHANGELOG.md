@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update git-cliff-action to version 4 in update-changelog workflow
 - Update unreleased changelog [skip ci]
 - Merge branch 'main' of https://github.com/Villy-P/libds-c
+- Update unreleased changelog [skip ci]
+- Merge branch 'main' of https://github.com/Villy-P/libds-c
+
+### Fixed
+
+- Amend to commit instead of create new commit
 
 ### Removed
 
