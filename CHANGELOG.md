@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-07-13
+
+### Added
+
+- Add stdint.h for SIZE_MAX definition (#19)
+
+### Changed
+
+- Update release workflow to generate changelog entries
+
+### Removed
+
+- Remove unnecessary OUTPUT environment variable from changelog generation step
+
 ## [v0.2.0] - 2026-07-13 - 2026-07-13
 
 ### Added
