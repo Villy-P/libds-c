@@ -1,6 +1,7 @@
 #define DS_C_IMPLEMENTATION
 // #define DS_THROWS_ERROR
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 

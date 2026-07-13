@@ -2,26 +2,24 @@
 .ONESHELL:
 .PHONY: setup setup-prod build build-prod run run-build-if clean rebuild production help precommit-install setup-dev clang-format clang-format-check
 
+# Sets up cross-platform support
+ifeq ($(OS),Windows_NT)
+	EXE := .exe
+	CLEAN := rmdir /S /Q
+	EXEC_PREFIX :=
+else
+	EXE :=
+	CLEAN := rm -rf
+	EXEC_PREFIX := ./
+endif
+
 # Sets up basic build variables
 BUILD_DIR := build
-BIN_DIR := $(BUILD_DIR)\bin
+BIN_DIR := bin
 JOBS ?= 4
 EXECUTABLE := libds-c-test
 CLANG_TIDY := clang-tidy
 CPPCHECK   := cppcheck
-
-# Sets up cross-platform support
-ifeq ($(OS),Windows_NT)
-	EXE := .exe
-	SEP := \\
-	CLEAN := cmd /c del /Q
-	EXEC_PREFIX :=
-else
-	EXE :=
-	SEP := /
-	CLEAN := rm -rf
-	EXEC_PREFIX := ./
-endif
 
 # Run once when first initializing project
 setup:
@@ -56,7 +54,7 @@ build-docs:
 # Runs the program: Use this when you make changed
 run: build
 	@echo Running main executable...
-	cd $(BIN_DIR) && "${EXEC_PREFIX}$(EXECUTABLE)$(EXE)" $(args)
+	cd "$(BUILD_DIR)/$(BIN_DIR)" && ./$(EXECUTABLE)$(EXE) $(args)
 
 # Cleans up the build directory
 clean:
