@@ -1,0 +1,43 @@
+# .github/workflows/release.yml
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'New version'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Promote Unreleased section to versioned release
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          sed -i "s/## \[Unreleased\]/## [${{ github.event.inputs.version }}] - $DATE/" CHANGELOG.md
+
+      - name: Commit and tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add CHANGELOG.md
+          git commit -m "chore(release): ${{ github.event.inputs.version }}"
+          git tag ${{ github.event.inputs.version }}
+          git push origin main
+          git push origin ${{ github.event.inputs.version }}
+
+      - name: Package headers
+        run: |
+          mkdir -p dist
+          zip -r dist/lib-ds-c-${{ github.event.inputs.version }}.zip include/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          body_path: CHANGELOG.md
+          files: dist/*.zip
