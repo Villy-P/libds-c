@@ -18,31 +18,8 @@ target_include_directories(${EXEC_NAME_TEST} PRIVATE include/)
 target_link_libraries(${EXEC_NAME_TEST} PRIVATE cpptrace::cpptrace common_flags)
 target_link_libraries(${EXEC_NAME_TEST} PRIVATE)
 
-find_program(CPPCHECK_EXE NAMES cppcheck)
-
 include(cmake/ClangTidy.cmake)
-
-if(CPPCHECK_EXE)
-    message(STATUS "cppcheck found: ${CPPCHECK_EXE}")
-    add_custom_target(cppcheck
-        COMMAND ${CPPCHECK_EXE}
-            --project=${CMAKE_BINARY_DIR}/compile_commands.json
-            --file-filter=${CMAKE_SOURCE_DIR}/src/*
-            --file-filter=${CMAKE_SOURCE_DIR}/include/*
-            --enable=warning,style,performance,portability
-            --suppress=missingIncludeSystem
-            --inline-suppr
-            --error-exitcode=1
-            --quiet
-            -j8
-        COMMENT "Running cppcheck..."
-        USES_TERMINAL
-        VERBATIM
-    )
-else()
-    message(STATUS "cppcheck not found")
-endif()
-
+include(cmake/CppCheck.cmake)
 
 add_custom_target(docs
     COMMAND doxygen ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile
