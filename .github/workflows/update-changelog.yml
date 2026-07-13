@@ -39,5 +39,17 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add CHANGELOG.md
-          git diff --cached --quiet || git commit -m "chore: update unreleased changelog [skip ci]"
-          git push origin main
+
+          if git diff --cached --quiet; then
+            echo "No changes to changelog"
+            exit 0
+          fi
+
+          LAST_MSG=$(git log -1 --pretty=%s)
+          if [[ "$LAST_MSG" == "chore: update unreleased changelog"* ]]; then
+            git commit --amend --no-edit
+            git push origin main --force-with-lease
+          else
+            git commit -m "chore: update unreleased changelog [skip ci]"
+            git push origin main
+          fi
