@@ -18,16 +18,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Promote Unreleased section to versioned release
-        run: |
-          DATE=$(date +%Y-%m-%d)
-          sed -i "s/## \[Unreleased\]/## [${{ github.event.inputs.version }}] - $DATE/" CHANGELOG.md
+      - name: Generate changelog entry and prepend
+        uses: orhun/git-cliff-action@v4
+        with:
+          args: --unreleased --tag ${{ github.event.inputs.version }} --prepend CHANGELOG.md
+        env:
+          OUTPUT: CHANGELOG.md
 
       - name: Commit and tag
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add CHANGELOG.md
+
+          if git diff --cached --quiet; then
+            echo "No changelog changes to commit"
+            exit 0
+          fi
+
           git commit -m "chore(release): ${{ github.event.inputs.version }}"
           git tag ${{ github.event.inputs.version }}
           git push origin main
@@ -37,6 +45,7 @@ jobs:
         run: |
           mkdir -p dist
           zip -r dist/lib-ds-c-${{ github.event.inputs.version }}.zip include/
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
