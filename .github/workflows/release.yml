@@ -34,7 +34,6 @@ jobs:
         run: |
           mkdir -p dist
           zip -r dist/lib-ds-c-${{ github.event.inputs.version }}.zip include/
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
