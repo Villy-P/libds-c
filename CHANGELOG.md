@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-07-13
+
+### Changed
+
+- Move dependencies to their own .cmake file
+- Move compiler flags to their own .cmake file
+- Move clang-tidy to their own .cmake file
+- Move cppcheck to their own .cmake file
+- Move docs to their own .cmake file
+
 ## [0.2.1] - 2026-07-13
 
 ### Added
