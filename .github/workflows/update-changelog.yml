@@ -26,8 +26,6 @@ jobs:
         run: |
           # Rebuild CHANGELOG.md: header + fresh Unreleased section + everything after the first existing release heading
           {
-            echo "# Changelog"
-            echo ""
             cat UNRELEASED.md
             echo ""
             # keep everything from the first "## [" that isn't "Unreleased" onward
