@@ -1,7 +1,5 @@
 # Changelog
 
-# Changelog
-
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -20,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Update git-cliff-action to version 4 in update-changelog workflow
+- Update unreleased changelog [skip ci]
+- Merge branch 'main' of https://github.com/Villy-P/libds-c
+
+### Removed
+
+- Remove duplicate Changelog header in CHANGELOG.md
 
 [Unreleased]: https://github.com/Villy-P/libds-c/compare/v0.1.0..Unreleased
 
