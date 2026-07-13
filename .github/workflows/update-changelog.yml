@@ -1,0 +1,42 @@
+name: Update Changelog
+on:
+  push:
+    branches: [main]
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate unreleased section
+        uses: orhun/git-cliff-action@v3
+        with:
+          args: --unreleased --tag "Unreleased"
+        env:
+          OUTPUT: UNRELEASED.md
+
+      - name: Merge into CHANGELOG.md
+        run: |
+          # Rebuild CHANGELOG.md: header + fresh Unreleased section + everything after the first existing release heading
+          {
+            echo "# Changelog"
+            echo ""
+            cat UNRELEASED.md
+            echo ""
+            # keep everything from the first "## [" that isn't "Unreleased" onward
+            awk '/^## \[/ && !/Unreleased/{found=1} found' CHANGELOG.md
+          } > CHANGELOG.new.md
+          mv CHANGELOG.new.md CHANGELOG.md
+          rm -f UNRELEASED.md
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add CHANGELOG.md
+          git diff --cached --quiet || git commit -m "chore: update unreleased changelog [skip ci]"
+          git push origin main
