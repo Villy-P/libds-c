@@ -18,54 +18,31 @@ target_include_directories(${EXEC_NAME_TEST} PRIVATE include/)
 target_link_libraries(${EXEC_NAME_TEST} PRIVATE cpptrace::cpptrace common_flags)
 target_link_libraries(${EXEC_NAME_TEST} PRIVATE)
 
-option(DS_ENABLE_ANALYSIS "Enable clang-tidy and cppcheck static analysis" OFF)
+find_program(CPPCHECK_EXE NAMES cppcheck)
 
-if (DS_ENABLE_ANALYSIS)
-    find_program(CLANG_TIDY_EXE NAMES clang-tidy)
-    find_program(CPPCHECK_EXE NAMES cppcheck)
+include(cmake/ClangTidy.cmake)
 
-    if(CLANG_TIDY_EXE)
-        message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-        set(CLANG_TIDY_COMMAND
-            ${CLANG_TIDY_EXE}
-            -quiet
-            --config-file=${CMAKE_SOURCE_DIR}/.clang-tidy
-            -p ${CMAKE_BINARY_DIR}
-        )
-        add_custom_target(clang-tidy
-            COMMAND ${CLANG_TIDY_COMMAND} ${JAKARTA_SOURCES}
-            COMMENT "Running clang-tidy..."
-            USES_TERMINAL
-            VERBATIM
-        )
-
-        set_target_properties(${EXEC_NAME} PROPERTIES C_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
-        set_target_properties(${EXEC_NAME_TEST} PROPERTIES C_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
-    else()
-        message(STATUS "clang-tidy not found")
-    endif()
-
-    if(CPPCHECK_EXE)
-        message(STATUS "cppcheck found: ${CPPCHECK_EXE}")
-        add_custom_target(cppcheck
-            COMMAND ${CPPCHECK_EXE}
-                --project=${CMAKE_BINARY_DIR}/compile_commands.json
-                --file-filter=${CMAKE_SOURCE_DIR}/src/*
-                --file-filter=${CMAKE_SOURCE_DIR}/include/*
-                --enable=warning,style,performance,portability
-                --suppress=missingIncludeSystem
-                --inline-suppr
-                --error-exitcode=1
-                --quiet
-                -j8
-            COMMENT "Running cppcheck..."
-            USES_TERMINAL
-            VERBATIM
-        )
-    else()
-        message(STATUS "cppcheck not found")
-    endif()
+if(CPPCHECK_EXE)
+    message(STATUS "cppcheck found: ${CPPCHECK_EXE}")
+    add_custom_target(cppcheck
+        COMMAND ${CPPCHECK_EXE}
+            --project=${CMAKE_BINARY_DIR}/compile_commands.json
+            --file-filter=${CMAKE_SOURCE_DIR}/src/*
+            --file-filter=${CMAKE_SOURCE_DIR}/include/*
+            --enable=warning,style,performance,portability
+            --suppress=missingIncludeSystem
+            --inline-suppr
+            --error-exitcode=1
+            --quiet
+            -j8
+        COMMENT "Running cppcheck..."
+        USES_TERMINAL
+        VERBATIM
+    )
+else()
+    message(STATUS "cppcheck not found")
 endif()
+
 
 add_custom_target(docs
     COMMAND doxygen ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile
