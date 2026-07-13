@@ -20,13 +20,7 @@ target_link_libraries(${EXEC_NAME_TEST} PRIVATE)
 
 include(cmake/ClangTidy.cmake)
 include(cmake/CppCheck.cmake)
-
-add_custom_target(docs
-    COMMAND doxygen ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Generating documentation"
-    VERBATIM
-)
+include(cmake/Docs.cmake)
 
 include(cmake/AddLibrary.cmake)
 include(cmake/ClangFormat.cmake)
