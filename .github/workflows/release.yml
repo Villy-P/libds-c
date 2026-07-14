@@ -23,6 +23,13 @@ jobs:
         with:
           args: --unreleased --tag ${{ github.event.inputs.version }} --prepend CHANGELOG.md
 
+      - name: Generate Release Notes
+        uses: orhun/git-cliff-action@v4
+        with:
+          args: --unreleased --tag ${{ github.event.inputs.version }} --strip header
+        env:
+          OUTPUT: RELEASE_NOTES.md
+
       - name: Commit and tag
         run: |
           git config user.name "github-actions"
@@ -48,5 +55,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.version }}
-          body_path: CHANGELOG.md
+          body_path: RELEASE_NOTES.md
           files: dist/*.zip
