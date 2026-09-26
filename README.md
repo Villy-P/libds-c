@@ -45,10 +45,8 @@ To include the function implementations, define `DS_C_IMPLEMENTATION` in exactly
 
 ``` c
 #define DS_C_IMPLEMENTATION
-#include <libds-c.h>
+#include <libds_c.h>
 ```
-
-Additionally, if you would like to have stack functions, define the `DS_DEFINE_STACK_IMPLEMENTATION` macro.
 
 Alternatively, you can add these with `CMake` using `add_definitions`:
 

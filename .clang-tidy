@@ -1,24 +1,25 @@
 Checks: >
-  *, 
-  -altera-struct-pack-align,
-  -altera-unroll-loops,
-  -android-cloexec-fopen,
-  -hicpp-signed-bitwise,
-  -llvmlibc-restrict-system-libc-headers,
-  -cppcoreguidelines-avoid-non-const-global-variables,
-  -readability-function-cognitive-complexity,
-  -readability-implicit-bool-conversion,
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  concurrency-*,
+  cppcoreguidelines-*,
+  google-*,
+  llvm-*,
+  misc-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
+
   -misc-no-recursion,
-  -altera-id-dependent-backward-branch,
-  -bugprone-easily-swappable-parameters,
-  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
-  -cppcoreguidelines-init-variables,
+  -llvm-header-guard,
+  -portability-avoid-pragma-once,
   -clang-analyzer-security.VAList,
-  -Wmacro-redefined,
-  -hicpp-use-nullptr,
-  -modernize-use-nullptr,
-  -bugprone-macro-parentheses
+  -bugprone-easily-swappable-parameters,
+  -readability-function-cognitive-complexity,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
 WarningsAsErrors: ''
-HeaderFilterRegex: '^(src|include)/.*'
+HeaderFilterRegex: '.*/(include|src|test)/.*'
 ExcludeHeaderFilterRegex: '.*(mingw|msys|ucrt|usr|clang|windows|build).*'
 FormatStyle: file

@@ -10,31 +10,6 @@
 
 #pragma once
 
-/**
- * @def DS_DEFINE_STACK_IMPLEMENTATION
- * @brief Define this in exactly one .c file before including the header
- *        to enable the implementation.
- *
- * @par Usage
- * Only one translation unit should define this. Defining it in multiple
- * .c files will cause linker errors due to duplicate symbols.
- *
- * @code
- * // my_file.c
- * #define DS_DEFINE_STACK_IMPLEMENTATION
- * #include "ds_stack.h"
- * @endcode
- *
- * @warning Defining this in a header file will cause duplicate symbol
- *          errors at link time.
- *
- * @ingroup stack_api
- */
-#ifdef DOXYGEN
-#define DS_DEFINE_STACK_IMPLEMENTATION
-#endif
-
-#ifdef DS_DEFINE_STACK_IMPLEMENTATION
 #include "ds_array.h"
 #include "ds_common.h"
 
@@ -317,4 +292,3 @@ static inline void* ds_stack_peek(ds_stack* stack) {
 static inline DS_STATUS ds_stack_reverse(ds_stack* stack) {
     return ds_array_reverse(stack);
 }
-#endif

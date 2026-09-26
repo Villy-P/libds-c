@@ -1,2 +1,5 @@
 CompileFlags:
   Add: [-DDS_C_IMPLEMENTATION]
+  Add: [-xc-header]
+
+PathMatch: .*\\.h
